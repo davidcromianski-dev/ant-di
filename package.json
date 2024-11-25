@@ -1,0 +1,39 @@
+{
+  "name": "ant-di",
+  "version": "1.0.0",
+  "author": {
+    "name": "David Cromianski",
+    "email": "davidcromianski.dev@gmail.com"
+  },
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:davidcromianski-dev/ant-di.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
+    "build": "vite build",
+    "prepublishOnly": "pnpm build"
+  },
+  "scripts": {
+    "build": "vite build",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^4.5.5",
+    "vite-plugin-dts": "^4.3.0"
+  }
+}
