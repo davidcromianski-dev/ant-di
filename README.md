@@ -6,14 +6,17 @@ This package is a simple dependency injection container for JavaScript. It is in
 ## Installation
 
 ```bash
-npm install ant-di
+# NPM
+npm install @davidcromianski-dev/ant-di@1.0.0
+# PNPM
+pnpm i @davidcromianski-dev/ant-di@1.0.0
 ```
 
 ## Usage
 
 ### Provider.ts
 ```typescript 
-import { Provider } from '@ant-di';
+import { Provider } from '@davidcromianski-dev/ant-di';
 import { Dependency } from '@some-dependency';
 import { AnotherDependency } from '@another-dependency';
 import { SomeClass } from './SomeClass';
@@ -38,7 +41,7 @@ export class CustomProvider implements Provider {
 
 ### DummyClass.ts
 ```typescript
-import { Container, Provider } from '@ant-di';
+import { Container, Provider } from '@davidcromianski-dev/ant-di';
 import { CustomProvider } from './Provider';
 
 export class DummyClass {
