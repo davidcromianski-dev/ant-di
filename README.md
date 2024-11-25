@@ -7,9 +7,9 @@ This package is a simple dependency injection container for JavaScript. It is in
 
 ```bash
 # NPM
-npm install @davidcromianski-dev/ant-di@1.0.0
+npm install @davidcromianski-dev/ant-di
 # PNPM
-pnpm i @davidcromianski-dev/ant-di@1.0.0
+pnpm i @davidcromianski-dev/ant-di
 ```
 
 ## Usage
