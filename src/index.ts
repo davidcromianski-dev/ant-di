@@ -30,12 +30,20 @@ class Container {
         });
 
         return new Proxy(this, {
-            get: (target, property: string) => {
-                return target.offsetGet(property);
+            get: (target, property) => {
+                if (typeof property === 'string') {
+                    if (target.offsetExists(property)) {
+                        return target.offsetGet(property);
+                    }
+                }
+                return target[property as keyof typeof target];
             },
-            set: (target, property: string, value: ValueOrFactory<any>): boolean => {
-                target.offsetSet(property, value);
-                return true;
+            set: (target, property, value) => {
+                if (typeof property === 'string') {
+                    target.offsetSet(property, value);
+                    return true;
+                }
+                return false;
             }
         });
     }
@@ -56,7 +64,6 @@ class Container {
 
         if (
             Object.keys(this._raw).includes(key)
-            || typeof this.values.get(key) !== 'object'
             || this.protected.has(this.values.get(key))
             || typeof this.values.get(key) !== 'function'
         ) {
@@ -98,7 +105,7 @@ class Container {
     }
 
     factory<T>(callable: Factory<T>): Factory<T> {
-        if (typeof callable !== 'object' || typeof callable !== 'function') {
+        if (typeof callable !== 'function') {
             throw new Error(messages.expectedInvokable);
         }
 
@@ -108,7 +115,7 @@ class Container {
     }
 
     protect<T>(callable: T): T {
-        if (typeof callable !== 'object' || typeof callable !== 'function') {
+        if (typeof callable !== 'function') {
             throw new Error(messages.expectedInvokable);
         }
 
@@ -130,7 +137,7 @@ class Container {
     }
 
     keys(): string[] {
-        return Object.keys(this.values);
+        return Array.from(this.values.keys());
     }
 
     register(provider: ServiceProviderInterface, values: Record<string, ValueOrFactory<any>> = {}): Container {

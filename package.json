@@ -1,6 +1,6 @@
 {
   "name": "@davidcromianski-dev/ant-di",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "David Cromianski",
     "email": "davidcromianski.dev@gmail.com"
@@ -29,9 +29,14 @@
   },
   "scripts": {
     "build": "vite build",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "vite": "^4.5.5",
     "vite-plugin-dts": "^4.3.0"
