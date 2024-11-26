@@ -2,7 +2,7 @@
 
 ## Simple JavaScript Dependency Injection Package
 
-This package is a simple dependency injection container for JavaScript. It is inspired by the PHP Pimple package.
+This package is a simple dependency injection container for JavaScript and TypeScript. It is inspired by the PHP Pimple package.
 
 ![ant-di](https://github.com/user-attachments/assets/ed38e310-6c24-4b7e-a90f-fc524c811393)
 
@@ -101,7 +101,7 @@ const keys = container.keys();
 To register service providers in the container, you can use the register method:
 
 ```typescript
-import { Contiainer, ServiceProviderInterface } from '@davidcromianski-dev/ant-di';
+import { Container, ServiceProviderInterface } from '@davidcromianski-dev/ant-di';
 
 class MyServiceProvider implements ServiceProviderInterface {
     register(container: Container) {
