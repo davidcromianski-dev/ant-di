@@ -4,7 +4,7 @@
 
 This package is a simple dependency injection container for JavaScript. It is inspired by the PHP Pimple package.
 
-![Ant DI]()
+![ant-di](https://github.com/user-attachments/assets/ed38e310-6c24-4b7e-a90f-fc524c811393)
 
 ## Installation
 
