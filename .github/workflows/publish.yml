@@ -12,11 +12,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -32,11 +27,15 @@ jobs:
       - name: Check for changes in package.json or index.ts
         id: check_changes
         run: |
-          git diff --name-only HEAD~1 HEAD > changes.txt
-          if grep -q -E "^(package\.json|index\.ts)$" changes.txt; then
-            echo "changes=true" >> $GITHUB_OUTPUT
-          else
+          if [ $(git rev-list --count HEAD) -le 1 ]; then
             echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            git diff --name-only HEAD~1 HEAD > changes.txt
+            if grep -q -E "^(package\.json|index\.ts)$" changes.txt; then
+              echo "changes=true" >> $GITHUB_OUTPUT
+            else
+              echo "changes=false" >> $GITHUB_OUTPUT
+            fi
           fi
 
       - name: Publish package
