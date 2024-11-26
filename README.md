@@ -101,9 +101,12 @@ const keys = container.keys();
 To register service providers in the container, you can use the register method:
 
 ```typescript
-class MyServiceProvider {
-    register(container) {
+import { Contiainer, ServiceProviderInterface } from '@davidcromianski-dev/ant-di';
+
+class MyServiceProvider implements ServiceProviderInterface {
+    register(container: Container) {
         container.offsetSet('service', () => new Service());
+        return container;
     }
 }
 
