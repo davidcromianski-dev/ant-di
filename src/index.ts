@@ -4,26 +4,27 @@ interface ServiceProviderInterface {
 
 type Factory<T> = (container: Container) => T;
 
-type ValueOrFactory<T> = T | Factory<T>;
+type Callable = ((...args: any[]) => any);
+
+type ValueOrFactoryOrCallable<T> = T | Factory<T> | Callable;
 
 const messages = {
     expectedInvokable: 'Callable is not a Closure or invokable object.',
     keyFrozen: (key: string) => `Key "${key}" is frozen and cannot be modified.`,
     keyIsNotDefined: (key: string) => `Key "${key}" is not defined.`,
-    protectedQuestion: (key: string) => `Are you sure "${key}" should be protected?`,
 }
 
 class Container {
     private values = new Map<string, any>();
     private factories;
     private protected;
-    private frozen = new Map<string, ValueOrFactory<any>>();
-    private _raw= new Map<string, ValueOrFactory<any>>();
+    private frozen = new Map<string, ValueOrFactoryOrCallable<any>>();
+    private _raw= new Map<string, ValueOrFactoryOrCallable<any>>();
     private _keys: string[] = [];
 
-    constructor(values: Record<string, ValueOrFactory<any>> = {}) {
-        this.factories = new Map();
-        this.protected = new Map();
+    constructor(values: Record<string, ValueOrFactoryOrCallable<any>> = {}) {
+        this.factories = new Map<Factory<any>, boolean>();
+        this.protected = new Map<Callable, boolean>();
 
         Object.entries(values).forEach(([key, value]) => {
             this.offsetSet(key, value);
@@ -48,7 +49,7 @@ class Container {
         });
     }
 
-    offsetSet<T>(key: string, value: ValueOrFactory<T>): void {
+    offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>): void {
         if (this.frozen.has(key)) {
             throw new Error(messages.keyFrozen(key));
         }
@@ -104,17 +105,17 @@ class Container {
         }
     }
 
-    factory<T>(callable: Factory<T>): Factory<T> {
-        if (typeof callable !== 'function') {
+    factory<T>(factory: Factory<T>): Factory<T> {
+        if (typeof factory !== 'function') {
             throw new Error(messages.expectedInvokable);
         }
 
-        this.factories.set(callable, true);
+        this.factories.set(factory, true);
 
-        return callable;
+        return factory;
     }
 
-    protect<T>(callable: T): T {
+    protect(callable: Callable): Callable {
         if (typeof callable !== 'function') {
             throw new Error(messages.expectedInvokable);
         }
@@ -140,7 +141,7 @@ class Container {
         return Array.from(this.values.keys());
     }
 
-    register(provider: ServiceProviderInterface, values: Record<string, ValueOrFactory<any>> = {}): Container {
+    register(provider: ServiceProviderInterface, values: Record<string, ValueOrFactoryOrCallable<any>> = {}): Container {
         provider.register(this);
 
         Object.entries(values).forEach(([key, value]) => {
