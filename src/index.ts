@@ -1,77 +1,147 @@
-export type ValueOrFactory<T> = T | (() => T) | ((container: Container) => T);
-
-export interface Provider {
+interface ServiceProviderInterface {
     register(container: Container): Container;
 }
 
-export class Container {
-    private registry = new Map<string, ValueOrFactory<any>>();
-    private singletons = new Map<string, any>();
+type Factory<T> = (container: Container) => T;
 
-    /**
-     * Register a value or factory in the container.
-     */
-    set<T>(key: string, value: ValueOrFactory<T>): void {
-        if (this.registry.has(key)) {
-            throw new Error(`Key "${key}" is already registered.`);
-        }
-        this.registry.set(key, value);
+type ValueOrFactory<T> = T | Factory<T>;
+
+const messages = {
+    expectedInvokable: 'Callable is not a Closure or invokable object.',
+    keyFrozen: (key: string) => `Key "${key}" is frozen and cannot be modified.`,
+    keyIsNotDefined: (key: string) => `Key "${key}" is not defined.`,
+    protectedQuestion: (key: string) => `Are you sure "${key}" should be protected?`,
+}
+
+class Container {
+    private values = new Map<string, any>();
+    private factories;
+    private protected;
+    private frozen = new Map<string, ValueOrFactory<any>>();
+    private _raw= new Map<string, ValueOrFactory<any>>();
+    private _keys: string[] = [];
+
+    constructor(values: Record<string, ValueOrFactory<any>> = {}) {
+        this.factories = new Map();
+        this.protected = new Map();
+
+        Object.entries(values).forEach(([key, value]) => {
+            this.offsetSet(key, value);
+        });
+
+        return new Proxy(this, {
+            get: (target, property: string) => {
+                return target.offsetGet(property);
+            },
+            set: (target, property: string, value: ValueOrFactory<any>): boolean => {
+                target.offsetSet(property, value);
+                return true;
+            }
+        });
     }
 
-    /**
-     * Get a value from the container.
-     */
-    get<T>(key: string): T {
-        if (!this.exists(key)) {
-            throw new Error(`Key "${key}" does not exist in the container.`);
+    offsetSet<T>(key: string, value: ValueOrFactory<T>): void {
+        if (this.frozen.has(key)) {
+            throw new Error(messages.keyFrozen(key));
         }
 
-        // Verificar se é singleton
-        if (this.singletons.has(key)) {
-            return this.singletons.get(key);
+        this.values.set(key, value);
+        this._keys.push(key);
+    }
+
+    offsetGet<T>(key: string): T {
+        if (!this.offsetExists(key)) {
+            throw new Error(messages.keyFrozen(key));
         }
 
-        const value = this.registry.get(key);
-
-        // Se for função ou fábrica, executar
-        if (typeof value === 'function') {
-            const resolvedValue = value instanceof Function ? value(this) : value();
-            this.singletons.set(key, resolvedValue);
-            return resolvedValue;
+        if (
+            Object.keys(this._raw).includes(key)
+            || typeof this.values.get(key) !== 'object'
+            || this.protected.has(this.values.get(key))
+            || typeof this.values.get(key) !== 'function'
+        ) {
+            return this.values.get(key);
         }
+
+        if (this.factories.has(this.values.get(key))) {
+            return this.values.get(key)(this);
+        }
+
+        const raw = this.values.get(key);
+        const value = this.values
+            .set(key, raw(this))
+            .get(key);
+
+        this._raw.set(key, raw);
+
+        this.frozen.set(key, true);
 
         return value;
     }
 
-    /**
-     * Check if a key exists in the container.
-     */
-    exists(key: string): boolean {
-        return this.registry.has(key);
+    offsetExists(key: string): boolean {
+        return this._keys.includes(key);
     }
 
-    /**
-     * List all values in the container.
-     */
-    list(): Record<string, any> {
-        const result: Record<string, any> = {};
-        this.registry.forEach((value, key) => {
-            result[key] = value;
-        });
-        return result;
+    offsetUnset(key: string): void {
+        if (this._keys.includes(key)) {
+            if (typeof this.values.get(key) === 'object') {
+                this.factories.delete(this.values.get(key));
+                this.protected.delete(this.values.get(key));
+            }
+
+            this.values.delete(key);
+            this.frozen.delete(key);
+            this._raw.delete(key);
+            this._keys = this._keys.filter((item) => item !== key);
+        }
     }
 
-    /**
-     * List all keys in the container.
-     */
+    factory<T>(callable: Factory<T>): Factory<T> {
+        if (typeof callable !== 'object' || typeof callable !== 'function') {
+            throw new Error(messages.expectedInvokable);
+        }
+
+        this.factories.set(callable, true);
+
+        return callable;
+    }
+
+    protect<T>(callable: T): T {
+        if (typeof callable !== 'object' || typeof callable !== 'function') {
+            throw new Error(messages.expectedInvokable);
+        }
+
+        this.protected.set(callable, true);
+
+        return callable;
+    }
+
+    raw<T>(key: string): T {
+        if (!this._keys.includes(key)) {
+            throw new Error(messages.keyIsNotDefined(key));
+        }
+
+        if (this._raw.has(key)) {
+            return this._raw.get(key);
+        }
+
+        return this.values.get(key);
+    }
+
     keys(): string[] {
-        return Array.from(this.registry.keys());
+        return Object.keys(this.values);
     }
 
-    /**
-     * Calls the register method from the provider.
-     */
-    register(provider: Provider): void {
+    register(provider: ServiceProviderInterface, values: Record<string, ValueOrFactory<any>> = {}): Container {
         provider.register(this);
+
+        Object.entries(values).forEach(([key, value]) => {
+            this.offsetSet(key, value);
+        });
+
+        return this;
     }
 }
+
+export { Container, ServiceProviderInterface };
