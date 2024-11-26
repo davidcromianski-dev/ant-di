@@ -152,4 +152,4 @@ class Container {
     }
 }
 
-export { Container, ServiceProviderInterface };
+export { Container, ServiceProviderInterface, Factory, Callable, ValueOrFactoryOrCallable };
