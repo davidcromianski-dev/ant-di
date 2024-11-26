@@ -1,32 +1,41 @@
-name: Publish
+name: Publish Package
 
 on:
   push:
     branches:
       - master
-    paths:
-      - 'src/index.ts'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 'lts/*'
+          cache: 'pnpm'
+
+      - name: Install PNPM
+        run: npm install -g pnpm
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build project
-        run: pnpm build
+      - name: Check for changes in package.json or index.ts
+        id: check_changes
+        run: |
+          git diff --name-only HEAD~1 HEAD > changes.txt
+          if grep -q -E "^(package\.json|index\.ts)$" changes.txt; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Publish package
+        if: steps.check_changes.outputs.changes == 'true'
         run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
