@@ -1,6 +1,6 @@
 {
   "name": "@davidcromianski-dev/ant-di",
-  "version": "1.0.6",
+  "version": "0.0.1-dev",
   "author": {
     "name": "David Cromianski",
     "email": "davidcromianski.dev@gmail.com"
@@ -16,7 +16,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.test.d.ts"
   ],
   "repository": {
     "type": "git",
