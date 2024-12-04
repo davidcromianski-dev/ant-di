@@ -1,6 +1,6 @@
 {
   "name": "@davidcromianski-dev/ant-di",
-  "version": "0.0.1-dev",
+  "version": "0.0.2-dev",
   "author": {
     "name": "David Cromianski",
     "email": "davidcromianski.dev@gmail.com"
@@ -26,7 +26,8 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/",
     "build": "vite build",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "access": "public"
   },
   "scripts": {
     "build": "vite build",
