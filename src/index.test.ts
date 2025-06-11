@@ -9,7 +9,7 @@ describe('Container', () => {
 
     it('should throw an error when getting a non-existent key', () => {
         const container = new Container();
-        expect(() => container.offsetGet('nonExistentKey')).toThrow('Key "nonExistentKey" is frozen and cannot be modified.');
+        expect(() => container.offsetGet('nonExistentKey')).toThrow('Key "nonExistentKey" is not defined.');
     });
 
     it('should check if a key exists', () => {
