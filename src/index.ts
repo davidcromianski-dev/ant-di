@@ -60,7 +60,7 @@ class Container {
 
     offsetGet<T>(key: string): T {
         if (!this.offsetExists(key)) {
-            throw new Error(messages.keyFrozen(key));
+            throw new Error(messages.keyIsNotDefined(key));
         }
 
         if (
