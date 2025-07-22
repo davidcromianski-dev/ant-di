@@ -9,7 +9,7 @@ This package is a simple dependency injection container for JavaScript and TypeS
 ## Features
 
 - **Simple and lightweight** - Easy to use dependency injection container
-- **Auto-wiring** - Automatic dependency resolution for TypeScript classes
+- **Auto-wiring** - Manual dependency resolution for TypeScript classes (automatic depends on `reflect-metadata`, that is currently not supported and experimental)
 - **Internationalization** - Multi-language error messages (EN, PT-BR, ES)
 - **Factory support** - Create new instances on each request
 - **Protected callables** - Store functions without executing them
@@ -44,7 +44,7 @@ The following dependencies are used for development, testing, and building:
 - **[vite-plugin-dts](https://github.com/qmhc/vite-plugin-dts)** `^4.3.0` - TypeScript declaration file generation for Vite
 
 ### Optional Dependencies
-- **reflect-metadata** - Required only if you want to use decorator-based dependency injection instead of manual registration
+- **reflect-metadata** - Required only if you want to use decorator-based dependency injection instead of manual registration (currently not supported and experimental)
 
 ## Quick Start
 
@@ -137,7 +137,7 @@ container.offsetUnset('service');
 
 ### Auto-wiring
 
-Ant DI supports automatic dependency injection for TypeScript classes. You can register dependencies manually or use reflect-metadata.
+Ant DI supports manual dependency injection for TypeScript classes. You can register dependencies manually.
 
 #### Manual Dependency Registration
 
