@@ -1,5 +1,4 @@
-import 'reflect-metadata';
-import { IServiceProvider, Factory, Callable, ValueOrFactoryOrCallable } from './interfaces';
+// import 'reflect-metadata';
 
 export { Container } from './container';
-export { IServiceProvider, Factory, Callable, ValueOrFactoryOrCallable };
+export type { IServiceProvider, Factory, Callable, ValueOrFactoryOrCallable } from './interfaces';

@@ -5,7 +5,7 @@ export default defineConfig({
     build: {
         lib: {
             entry: 'src/index.ts',
-            name: 'ixc-js-di',
+            name: 'ant-di',
             fileName: (format) => `index.${format}.js`
         },
     },
