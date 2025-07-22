@@ -1,17 +1,54 @@
 import { IServiceProvider, Factory, Callable, ValueOrFactoryOrCallable } from './interfaces';
 import enUsMessages from './i18n/en-us';
+import ptBrMessages from './i18n/pt-br';
+import esEsMessages from './i18n/es-es';
 
+/**
+ * Dependency injection container that supports auto-wiring, factories, and service providers.
+ * Implements a Pimple-like interface with additional features for TypeScript.
+ */
 export class Container {
+    /** Available language packs for internationalization */
+    static langs = {
+        'en-us': enUsMessages,
+        'pt-br': ptBrMessages,
+        'es-es': esEsMessages
+    };
+
+    /** Current language setting */
     private currentLang: string = 'en-us';
+
+    /** Localized message functions for the current language */
     private localizedMessages: any = enUsMessages;
-    private values = new Map<string, any>(); // For string-keyed services
-    private classInstanceCache = new Map<Function, any>(); // For constructor-keyed singletons
+
+    /** Map of string keys to their corresponding values/services */
+    private values = new Map<string, any>();
+
+    /** Cache for singleton class instances keyed by constructor */
+    private classInstanceCache = new Map<Function, any>();
+
+    /** Map of factory functions to their registration status */
     private factories: Map<Factory<any>, boolean>;
+
+    /** Map of protected callables to their protection status */
     private protected: Map<Callable, boolean>;
+
+    /** Map of frozen keys that cannot be modified after first resolution */
     private frozen = new Map<string, ValueOrFactoryOrCallable<any>>();
-    private _raw= new Map<string, ValueOrFactoryOrCallable<any>>();
+
+    /** Map of original factory functions before resolution */
+    private _raw = new Map<string, ValueOrFactoryOrCallable<any>>();
+
+    /** Array of all registered keys */
     private _keys: string[] = [];
 
+    /** Manual dependency registration map for constructors */
+    private dependencyMap = new Map<Function, any[]>();
+
+    /**
+     * Creates a new container instance with optional initial values.
+     * @param values - Initial key-value pairs to register in the container
+     */
     constructor(values: Record<string, ValueOrFactoryOrCallable<any>> = {}) {
         this.factories = new Map<Factory<any>, boolean>();
         this.protected = new Map<Callable, boolean>();
@@ -39,15 +76,51 @@ export class Container {
         });
     }
 
-    public async setLanguage(lang: string): Promise<void> {
-        if (lang === 'en-us') {
-            this.localizedMessages = enUsMessages;
+    /**
+     * Registers dependencies for a constructor function manually.
+     * @param constructor - The constructor function to register dependencies for
+     * @param dependencies - Array of dependency types/constructors
+     */
+    registerDependencies(constructor: Function, dependencies: any[]): void {
+        this.dependencyMap.set(constructor, dependencies);
+    }
+
+    /**
+     * Registers dependencies for a class by its name.
+     * @param className - The name of the class to register dependencies for
+     * @param dependencies - Array of dependency types/constructors
+     */
+    registerDependenciesByName(className: string, dependencies: any[]): void {
+        this.dependencyMap.set(className as any, dependencies);
+    }
+
+    /**
+     * Sets the language for localized error messages.
+     * @param lang - The language code to set
+     */
+    public async setLanguage(lang: keyof typeof Container.langs): Promise<void> {
+        if (Container.langs[lang]) {
+            this.localizedMessages = Container.langs[lang];
             this.currentLang = lang;
         } else {
-            console.warn(`Language ${lang} not supported. Keeping ${this.currentLang}.`);
+            console.warn(this.localizedMessages.languageNotSupported(lang, this.currentLang));
         }
     }
 
+    /**
+     * Gets the current language setting.
+     * @returns The current language code
+     */
+    public getLanguage(): keyof typeof Container.langs {
+        return this.currentLang as keyof typeof Container.langs;
+    }
+
+    /**
+     * Sets a value or service in the container.
+     * @param key - The key to associate with the value
+     * @param value - The value, factory function, or callable to store
+     * @throws {Error} If the key is frozen and cannot be modified
+     */
     offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>): void {
         if (this.frozen.has(key)) {
             throw new Error(this.localizedMessages.keyFrozen(key));
@@ -58,21 +131,42 @@ export class Container {
         }
     }
 
+    /**
+     * Automatically wires dependencies for a constructor function.
+     * @param constructor - The constructor function to auto-wire
+     * @param resolutionPath - Current resolution path for circular dependency detection
+     * @returns A new instance of the class with dependencies injected
+     * @throws {Error} If circular dependencies are detected or dependencies cannot be resolved
+     */
     private _autoWire<T>(constructor: { new(...args: any[]): T }, resolutionPath: string[]): T {
         const constructorName = constructor.name;
         if (resolutionPath.includes(constructorName)) {
             throw new Error(this.localizedMessages.circularDependency(resolutionPath.join(' -> '), constructorName));
         }
         resolutionPath.push(constructorName);
-        const paramTypes: any[] = Reflect.getMetadata('design:paramtypes', constructor);
-        if (!paramTypes) {
-            resolutionPath.pop();
-            throw new Error(this.localizedMessages.couldNotResolveForConstructor(constructorName));
+        
+        let paramTypes: any[] = [];
+        if (this.dependencyMap.has(constructor)) {
+            paramTypes = this.dependencyMap.get(constructor) || [];
+        } else if (this.dependencyMap.has(constructorName as any)) {
+            paramTypes = this.dependencyMap.get(constructorName as any) || [];
+        } else {
+            try {
+                paramTypes = Reflect.getMetadata('design:paramtypes', constructor) || [];
+            } catch (e) {
+                throw new Error(this.localizedMessages.noDependenciesRegistered(constructorName));
+            }
         }
+        
+        if (!paramTypes || paramTypes.length === 0) {
+            resolutionPath.pop();
+            return new constructor();
+        }
+        
         const resolvedParams = paramTypes.map(paramType => {
             if (paramType === undefined) {
-                 resolutionPath.pop();
-                 throw new Error(this.localizedMessages.failedToResolveDueToUndefinedParam(constructorName));
+                resolutionPath.pop();
+                throw new Error(this.localizedMessages.failedToResolveDueToUndefinedParam(constructorName));
             }
             try {
                 return this.offsetGet(paramType, [...resolutionPath]);
@@ -86,9 +180,15 @@ export class Container {
         return instance;
     }
 
+    /**
+     * Retrieves a value or service from the container.
+     * @param key - The key or constructor function to retrieve
+     * @param resolutionPath - Current resolution path for circular dependency detection
+     * @returns The resolved value or service instance
+     * @throws {Error} If the key is not defined or dependencies cannot be resolved
+     */
     offsetGet<T>(key: string | { new(...args: any[]): T }, resolutionPath: string[] = []): T {
         if (typeof key === 'function') {
-            // Handle constructor or factory function key
             if (this.classInstanceCache.has(key)) {
                 return this.classInstanceCache.get(key) as T;
             }
@@ -102,10 +202,9 @@ export class Container {
                 }
                 if (this.factories.has(valueByName) && typeof valueByName === 'function') {
                     if (!this.protected.has(valueByName)) {
-                        // Not caching result of factory-by-name here in classInstanceCache by default
                         return valueByName(this) as T;
                     } else {
-                        return valueByName as unknown as T; // Protected factory
+                        return valueByName as unknown as T;
                     }
                 }
             }
@@ -115,10 +214,10 @@ export class Container {
                 if (!this.protected.has(factoryFn)) {
                     return factoryFn(this) as T;
                 }
-                return factoryFn as unknown as T; // Protected factory
+                return factoryFn as unknown as T;
             }
 
-            if (typeof key.prototype !== 'undefined') { // Check if it's a class constructor
+            if (typeof key.prototype !== 'undefined') {
                 try {
                     const instance = this._autoWire(key as { new(...args: any[]): T }, resolutionPath);
                     this.classInstanceCache.set(key, instance);
@@ -130,75 +229,71 @@ export class Container {
                     throw new Error(this.localizedMessages.autoWiringFailed(key.name, (e as Error).message));
                 }
             }
-            throw new Error(this.localizedMessages.keyIsNotDefined(key.name)); // Unresolvable function key
 
-        } else { // key is a string
+            throw new Error(this.localizedMessages.keyIsNotDefined(key.name));
+        } else {
             const cacheKey = key;
             if (this.values.has(cacheKey)) {
                 const cachedValue = this.values.get(cacheKey);
+                const isProtected = this.protected.has(cachedValue);
                 if (this.factories.has(cachedValue)) {
-                    if (!this.protected.has(cachedValue)) {
-                        return cachedValue(this) as T;
+                    if (isProtected) {
+                        return cachedValue as unknown as T;
                     }
-                    return cachedValue as unknown as T; // Protected factory
+                    return cachedValue(this) as T;
                 }
-                return cachedValue as T; // Direct value
+                if (typeof cachedValue === 'function') {
+                    if (isProtected) {
+                        return cachedValue as unknown as T;
+                    }
+                    const result = cachedValue(this);
+                    this.values.set(cacheKey, result);
+                    if (!this._raw.has(cacheKey)) {
+                        this._raw.set(cacheKey, cachedValue as ValueOrFactoryOrCallable<any>);
+                    }
+                    this.frozen.set(cacheKey, true);
+                    return result as T;
+                }
+                return cachedValue as T;
             }
 
-            // Fallback for string keys that might represent raw functions (original implicit factory behavior)
-            // This was the original Pimple behavior: a service definition (function) is replaced by its result on first get.
-            // For this to work, the function must have been initially set via offsetSet(key, rawFunction)
-            // and this.values.get(key) above would have returned that rawFunction.
-            // The check `!this.factories.has(cachedValue)` above would be true.
-            // The check `!this.protected.has(cachedValue)` would be true.
-            // So it would have been returned by `return cachedValue as T;`
-            // This means the raw function itself is returned if it's not called.
-            // This is not what Pimple does. Pimple calls it.
-            // The previous `offsetGet` had this logic more explicitly for string keys:
-            // if (typeof value === 'function' && !this.factories.has(value) && !this.protected.has(value)) {
-            //    const raw = value; result = raw(this); this.values.set(key, result); this._raw.set(key,raw)...
-            // }
-            // This implicit factory execution for string keys is missing from the current refactor of the string path.
-            // Let's re-add it:
-            const rawValue = this.values.get(cacheKey); // This will be undefined if not in values
-            if (typeof rawValue === 'function' && !this.factories.has(rawValue) && !this.protected.has(rawValue)) {
-                const result = rawValue(this);
-                this.values.set(cacheKey, result); // Cache the result
-                if (!this._raw.has(cacheKey)) { // Store the original raw function
-                    this._raw.set(cacheKey, rawValue as ValueOrFactoryOrCallable<any>);
-                }
-                this.frozen.set(cacheKey, true); // Mark as frozen
-                return result as T;
-            }
-            // If not in values, and not an implicit factory that was missed:
             throw new Error(this.localizedMessages.keyIsNotDefined(cacheKey));
         }
     }
 
+    /**
+     * Checks if a key exists in the container.
+     * @param key - The key to check
+     * @returns True if the key exists, false otherwise
+     */
     offsetExists(key: string): boolean {
-        return this._keys.includes(key) || this.values.has(key) || this.classInstanceCache.has(key as any); // key might be constructor
+        return this._keys.includes(key) || this.values.has(key) || this.classInstanceCache.has(key as any);
     }
 
+    /**
+     * Removes a key and its associated value from the container.
+     * @param key - The key to remove
+     */
     offsetUnset(key: string): void {
         if (this._keys.includes(key)) {
-            const value = this.values.get(key); // String key
+            const value = this.values.get(key);
             if (typeof value === 'object' || typeof value === 'function') {
-                 if (this.factories) this.factories.delete(value);
-                 if (this.protected) this.protected.delete(value);
+                if (this.factories) this.factories.delete(value);
+                if (this.protected) this.protected.delete(value);
             }
-            // Also attempt to find a class constructor if key is a name
-            // This part is tricky because _keys can have Class.name.
-            // For now, unset primarily works reliably for string keys used in offsetSet.
             this.values.delete(key);
             this.frozen.delete(key);
             this._raw.delete(key);
             this._keys = this._keys.filter((item) => item !== key);
-            // Should also clear from classInstanceCache if key is a class name
-            // This requires iterating classInstanceCache or having a reverse map.
-            // For simplicity, direct class constructor unset: container.unset(MyClass) is not supported by this string key method.
         }
     }
 
+    /**
+     * Marks a function as a factory that will be called each time it's accessed.
+     * @param factory - The factory function to register
+     * @returns The factory function
+     * @throws {Error} If the factory is not a function
+     */
     factory<T>(factory: Factory<T>): Factory<T> {
         if (typeof factory !== 'function') {
             throw new Error(this.localizedMessages.expectedInvokable);
@@ -207,6 +302,12 @@ export class Container {
         return factory;
     }
 
+    /**
+     * Marks a callable as protected, preventing it from being executed.
+     * @param callable - The callable to protect
+     * @returns The protected callable
+     * @throws {Error} If the callable is not a function
+     */
     protect(callable: Callable): Callable {
         if (typeof callable !== 'function') {
             throw new Error(this.localizedMessages.expectedInvokable);
@@ -215,24 +316,38 @@ export class Container {
         return callable;
     }
 
+    /**
+     * Gets the raw value (original factory function) before resolution.
+     * @param key - The key to get the raw value for
+     * @returns The raw value or factory function
+     * @throws {Error} If the key is not defined
+     */
     raw<T>(key: string): T {
-        if (!this.values.has(key) && !this._raw.has(key)) { // Check both, as _raw might have original factory
-             throw new Error(this.localizedMessages.keyIsNotDefined(key));
+        if (!this.values.has(key) && !this._raw.has(key)) {
+            throw new Error(this.localizedMessages.keyIsNotDefined(key));
         }
-        if (this._raw.has(key)) { // Prefer _raw if it exists
+        if (this._raw.has(key)) {
             return this._raw.get(key) as T;
         }
         return this.values.get(key) as T;
     }
 
+    /**
+     * Gets all registered keys in the container.
+     * @returns Array of all registered keys
+     */
     keys(): string[] {
-        // This should return all keys known to the container, including string keys for services,
-        // names of auto-wired classes, etc.
         return Array.from(new Set([...this._keys, ...Array.from(this.values.keys())]));
     }
 
+    /**
+     * Registers a service provider and optional values.
+     * @param provider - The service provider to register
+     * @param values - Optional additional values to register
+     * @returns The container instance for chaining
+     */
     register(provider: IServiceProvider, values: Record<string, ValueOrFactoryOrCallable<any>> = {}): Container {
-        provider.register(this as any); // Cast to any due to interface mismatch (Container vs any)
+        provider.register(this as any);
         Object.entries(values).forEach(([key, value]) => {
             this.offsetSet(key, value);
         });

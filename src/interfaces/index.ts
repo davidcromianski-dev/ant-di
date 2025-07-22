@@ -1,8 +1,8 @@
 export interface IServiceProvider {
-    register(container: any): any; // Was Container
+    register(container: any): any;
 }
 
-export type Factory<T> = (container: any) => T; // Was Container
+export type Factory<T> = (container: any) => T;
 
 export type Callable = ((...args: any[]) => any);
 

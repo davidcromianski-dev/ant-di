@@ -32,14 +32,13 @@
   "scripts": {
     "build": "vite build",
     "prepublishOnly": "pnpm build",
-    "test": "jest"
+    "test": "poku"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.14",
-    "jest": "^29.7.0",
+    "poku": "^3.0.2",
     "reflect-metadata": "^0.2.2",
-    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "typescript": "^5.7.2",
     "vite": "^4.5.5",
     "vite-plugin-dts": "^4.3.0"
