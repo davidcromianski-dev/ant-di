@@ -38,12 +38,12 @@ This package has **zero runtime dependencies**, making it lightweight and avoidi
 ### Development Dependencies
 The following dependencies are used for development, testing, and building:
 
-- **[poku](https://github.com/antfu/poku)** `^3.0.2` - Fast test runner for Node.js
-- **[ts-node](https://github.com/TypeStrong/ts-node)** `^10.9.2` - TypeScript execution engine for Node.js
-- **[tsx](https://github.com/esbuild-kit/tsx)** `^4.20.3` - TypeScript execution engine with esbuild
-- **[typescript](https://github.com/microsoft/TypeScript)** `^5.7.2` - TypeScript compiler
-- **[vite](https://github.com/vitejs/vite)** `^4.5.5` - Build tool and dev server
-- **[vite-plugin-dts](https://github.com/qmhc/vite-plugin-dts)** `^4.3.0` - TypeScript declaration file generation for Vite
+- **[poku](https://github.com/antfu/poku)** - Fast test runner for Node.js
+- **[ts-node](https://github.com/TypeStrong/ts-node)** - TypeScript execution engine for Node.js
+- **[tsx](https://github.com/esbuild-kit/tsx)** - TypeScript execution engine with esbuild
+- **[typescript](https://github.com/microsoft/TypeScript)** - TypeScript compiler
+- **[vite](https://github.com/vitejs/vite)** - Build tool and dev server
+- **[vite-plugin-dts](https://github.com/qmhc/vite-plugin-dts)** - TypeScript declaration file generation for Vite
 
 ## Quick Start
 
