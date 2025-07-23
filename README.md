@@ -36,15 +36,11 @@ This package has **zero runtime dependencies**, making it lightweight and avoidi
 The following dependencies are used for development, testing, and building:
 
 - **[poku](https://github.com/antfu/poku)** `^3.0.2` - Fast test runner for Node.js
-- **[reflect-metadata](https://github.com/rbuckton/reflect-metadata)** `^0.2.2` - Polyfill for Metadata Reflection API
 - **[ts-node](https://github.com/TypeStrong/ts-node)** `^10.9.2` - TypeScript execution engine for Node.js
 - **[tsx](https://github.com/esbuild-kit/tsx)** `^4.20.3` - TypeScript execution engine with esbuild
 - **[typescript](https://github.com/microsoft/TypeScript)** `^5.7.2` - TypeScript compiler
 - **[vite](https://github.com/vitejs/vite)** `^4.5.5` - Build tool and dev server
 - **[vite-plugin-dts](https://github.com/qmhc/vite-plugin-dts)** `^4.3.0` - TypeScript declaration file generation for Vite
-
-### Optional Dependencies
-- **reflect-metadata** - Required only if you want to use decorator-based dependency injection instead of manual registration (currently not supported and experimental)
 
 ## Quick Start
 

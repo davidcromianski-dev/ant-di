@@ -1,4 +1,4 @@
-import { Container } from '../src/index';
+import { Container } from '../src';
 
 /**
  * Examples demonstrating dependency injection and auto-wiring
@@ -77,7 +77,7 @@ export function dependencyInjectionExamples() {
     console.log('\nCircular dependency test:');
     try {
         container.offsetGet(ServiceA);
-    } catch (error) {
+    } catch (error: any) {
         console.log('Caught circular dependency:', error.message);
     }
 } 

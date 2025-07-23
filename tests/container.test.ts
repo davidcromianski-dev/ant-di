@@ -1,6 +1,5 @@
-import 'reflect-metadata';
 import { describe, it, assert } from 'poku';
-import { Container, IServiceProvider } from '../src/index';
+import { Container, IServiceProvider } from '../src';
 
 // Test classes for auto-wiring (without decorators)
 class NoDepsClass {

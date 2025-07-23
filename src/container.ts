@@ -19,7 +19,7 @@ export class Container {
     private currentLang: string = 'en-us';
 
     /** Localized message functions for the current language */
-    private localizedMessages: any = enUsMessages;
+    private localizedMessages = enUsMessages;
 
     /** Map of string keys to their corresponding values/services */
     private values = new Map<string, any>();
@@ -151,11 +151,7 @@ export class Container {
         } else if (this.dependencyMap.has(constructorName as any)) {
             paramTypes = this.dependencyMap.get(constructorName as any) || [];
         } else {
-            try {
-                paramTypes = Reflect.getMetadata('design:paramtypes', constructor) || [];
-            } catch (e) {
-                throw new Error(this.localizedMessages.noDependenciesRegistered(constructorName));
-            }
+            throw new Error(this.localizedMessages.noDependenciesRegistered(constructorName));
         }
         
         if (!paramTypes || paramTypes.length === 0) {

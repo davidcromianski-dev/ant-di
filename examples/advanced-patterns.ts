@@ -1,4 +1,4 @@
-import { Container } from '../src/index';
+import { Container } from '../src';
 
 /**
  * Advanced usage patterns and real-world scenarios
@@ -102,8 +102,8 @@ export function advancedPatternsExamples() {
     container.offsetSet('lifecycle', lifecycleService);
 
     console.log('\nService lifecycle:');
-    const service1 = container.offsetGet('lifecycle');
-    const service2 = container.offsetGet('lifecycle');
+    const service1 = container.offsetGet('lifecycle') as any;
+    const service2 = container.offsetGet('lifecycle') as any;
     console.log('Service 1 ID:', service1.id);
     console.log('Service 2 ID:', service2.id);
     console.log('Different instances:', service1.id !== service2.id);

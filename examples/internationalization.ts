@@ -1,4 +1,4 @@
-import { Container } from '../src/index';
+import { Container } from '../src';
 
 /**
  * Examples showing internationalization features
@@ -19,7 +19,7 @@ export async function internationalizationExamples() {
     // 3. Test error messages in Portuguese
     try {
         container.offsetGet('nonexistent');
-    } catch (error) {
+    } catch (error: any) {
         console.log('Portuguese error:', error.message);
     }
 
@@ -32,7 +32,7 @@ export async function internationalizationExamples() {
         container.offsetSet('frozenKey', () => 'value');
         container.offsetGet('frozenKey');
         container.offsetSet('frozenKey', 'new value');
-    } catch (error) {
+    } catch (error: any) {
         console.log('Spanish error:', error.message);
     }
 

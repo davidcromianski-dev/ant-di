@@ -1,4 +1,4 @@
-import { Container, IServiceProvider } from '../src/index';
+import { Container, IServiceProvider } from '../src';
 
 /**
  * Examples demonstrating service provider pattern
@@ -54,11 +54,11 @@ export function serviceProviderExamples() {
     console.log('Host:', container.offsetGet('db.host'));
     console.log('Port:', container.offsetGet('db.port'));
     
-    const dbConnection = container.offsetGet('db.connection');
+    const dbConnection = container.offsetGet('db.connection') as any;
     console.log('Connection:', dbConnection.connect());
 
     console.log('\nCache services:');
-    const cache = container.offsetGet('cache');
+    const cache = container.offsetGet('cache') as any;
     console.log('Cache get:', cache.get('user:123'));
     console.log('Cache set:', cache.set('user:123', { name: 'John' }));
 

@@ -1,4 +1,4 @@
-import { Container } from '../src/index';
+import { Container } from '../src';
 
 /**
  * Basic usage examples showing fundamental container operations

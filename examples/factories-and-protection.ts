@@ -1,4 +1,4 @@
-import { Container } from '../src/index';
+import { Container } from '../src';
 
 /**
  * Examples showing factory functions and protection mechanisms
@@ -71,7 +71,7 @@ export function factoriesAndProtectionExamples() {
     console.log('\nFrozen key behavior:');
     try {
         container.offsetSet('notificationService', 'new value');
-    } catch (error) {
+    } catch (error: any) {
         console.log('Cannot modify frozen key:', error.message);
     }
 
