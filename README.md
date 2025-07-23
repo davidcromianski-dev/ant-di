@@ -24,8 +24,11 @@ This package is a simple dependency injection container for JavaScript and TypeS
 # NPM
 npm install @davidcromianski-dev/ant-di
 # PNPM
-pnpm i @davidcromianski-dev/ant-di
+pnpm add @davidcromianski-dev/ant-di
 ```
+
+> [!IMPORTANT]
+> This package is not yet published to npm, so you need to install it from the GitHub repository. Use the `.npmrc.example` file to create a `.npmrc` file in your project root.
 
 ## Dependencies
 
@@ -329,7 +332,7 @@ Tests are organized into logical groups:
 
 ```typescript
 import { test, assert } from 'poku';
-import { Container } from '../src/index';
+import { Container } from '../src';
 
 describe('Container', () => {
     describe('Basic Operations', () => {
