@@ -9,7 +9,8 @@ This package is a simple dependency injection container for JavaScript and TypeS
 ## Features
 
 - **Simple and lightweight** - Easy to use dependency injection container
-- **Auto-wiring** - Manual dependency resolution for TypeScript classes (automatic depends on `reflect-metadata`, that is currently not supported and experimental)
+- **Auto-wiring** - Manual dependency resolution for TypeScript classes with automatic singleton caching
+- **Singleton behavior** - Automatic instance caching ensures classes return the same instance
 - **Internationalization** - Multi-language error messages (EN, PT-BR, ES)
 - **Factory support** - Create new instances on each request
 - **Protected callables** - Store functions without executing them
@@ -154,10 +155,18 @@ const userService = container.offsetGet(UserService);
 
 #### Dependency Registration by Name
 
+For cases where you need to register dependencies using class names as strings (useful for dynamic registration or avoiding circular import issues):
+
 ```typescript
+// Alternative registration method using class name
 container.registerDependenciesByName('UserService', [DatabaseConnection, Logger]);
+
+// Both registration methods achieve the same result
 const userService = container.offsetGet(UserService);
 ```
+
+> [!TIP]
+> `registerDependenciesByName()` is particularly useful when dealing with dynamic class loading or when you want to avoid potential circular import issues in complex applications.
 
 #### Circular Dependency Detection
 
@@ -286,6 +295,47 @@ try {
 }
 ```
 
+#### Available Error Messages
+
+The following error messages are localized across all supported languages:
+
+- **expectedInvokable** - When a callable is not a function or invokable object
+- **keyFrozen** - When attempting to modify a frozen key
+- **keyIsNotDefined** - When accessing a non-existent key
+- **circularDependency** - When circular dependencies are detected
+- **couldNotResolveForConstructor** - When dependencies cannot be resolved for a constructor
+- **failedToResolveDependency** - When a specific dependency fails to resolve
+- **autoWiringFailed** - When auto-wiring process fails
+- **failedToResolveDueToUndefinedParam** - When parameter type is undefined (circular dependencies)
+- **languageNotSupported** - When an unsupported language is requested
+- **noDependenciesRegistered** - When no dependencies are registered for a class
+
+### Singleton Behavior & Instance Caching
+
+Ant DI automatically caches class instances to ensure singleton behavior:
+
+```typescript
+class DatabaseService {
+    constructor() {
+        console.log('DatabaseService created');
+    }
+}
+
+// Register the class
+container.registerDependencies(DatabaseService, []);
+
+// First access - creates instance
+const db1 = container.offsetGet(DatabaseService); // "DatabaseService created"
+
+// Second access - returns cached instance
+const db2 = container.offsetGet(DatabaseService); // No log (cached)
+
+console.log(db1 === db2); // true - same instance
+```
+
+> [!TIP]
+> Class instances are cached by their constructor function, ensuring that the same class always returns the same instance across the application.
+
 ### Proxy Access
 
 The container supports proxy access for convenient property-style access:
@@ -402,19 +452,30 @@ new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 
 #### Methods
 
-- `offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>): void`
-- `offsetGet<T>(key: string | Constructor<T>, resolutionPath?: string[]): T`
-- `offsetExists(key: string): boolean`
-- `offsetUnset(key: string): void`
-- `factory<T>(factory: Factory<T>): Factory<T>`
-- `protect(callable: Callable): Callable`
-- `raw<T>(key: string): T`
-- `keys(): string[]`
-- `register(provider: IServiceProvider, values?: Record<string, ValueOrFactoryOrCallable<any>>): Container`
-- `registerDependencies(constructor: Function, dependencies: any[]): void`
-- `registerDependenciesByName(className: string, dependencies: any[]): void`
-- `setLanguage(lang: keyof typeof Container.langs): Promise<void>`
-- `getLanguage(): keyof typeof Container.langs`
+##### Core Container Operations
+- `offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>): void` - Register a value, factory, or callable in the container
+- `offsetGet<T>(key: string | Constructor<T>, resolutionPath?: string[]): T` - Retrieve a service by key or class constructor with auto-wiring
+- `offsetExists(key: string): boolean` - Check if a key exists in the container
+- `offsetUnset(key: string): void` - Remove a key from the container
+
+##### Factory and Protection
+- `factory<T>(factory: Factory<T>): Factory<T>` - Mark a factory to always create new instances (prevents singleton caching)
+- `protect(callable: Callable): Callable` - Protect a callable from being treated as a factory
+
+##### Utility Methods
+- `raw<T>(key: string): T` - Get the raw value without executing factories or callables
+- `keys(): string[]` - Get all registered keys in the container
+
+##### Service Providers
+- `register(provider: IServiceProvider, values?: Record<string, ValueOrFactoryOrCallable<any>>): Container` - Register a service provider with optional additional values
+
+##### Dependency Injection
+- `registerDependencies(constructor: Function, dependencies: any[]): void` - Register dependencies for a class constructor
+- `registerDependenciesByName(className: string, dependencies: any[]): void` - Register dependencies using class name as string
+
+##### Internationalization
+- `setLanguage(lang: keyof typeof Container.langs): Promise<void>` - Set the language for error messages (en-us, pt-br, es-es)
+- `getLanguage(): keyof typeof Container.langs` - Get the current language setting
 
 ## Contributing
 
