@@ -25,3 +25,4 @@ dist-ssr
 /.npmrc
 /auth.json
 /coverage/
+COMPARISON.md
