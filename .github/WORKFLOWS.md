@@ -48,7 +48,7 @@ Para fazer deploy manualmente:
 ├── workflows/
 │   ├── test.yml           # Testes do projeto principal
 │   └── deploy-site.yml    # Deploy do site
-└── README.md             # Este arquivo
+└── WORKFLOWS.md             # Este arquivo
 
 site/                     # Site React
 ├── public/              # Arquivos estáticos
