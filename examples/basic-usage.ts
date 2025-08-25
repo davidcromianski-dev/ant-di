@@ -3,7 +3,7 @@ import { Container } from '../src';
 /**
  * Basic usage examples showing fundamental container operations
  */
-export function basicUsageExamples() {
+function basicUsageExamples() {
     console.log('=== Basic Usage Examples ===\n');
 
     // Create a container
@@ -49,3 +49,5 @@ export function basicUsageExamples() {
     console.log('\nAfter unsetting debug:');
     console.log('debug exists:', container.offsetExists('debug'));
 } 
+
+basicUsageExamples();

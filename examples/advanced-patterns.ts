@@ -36,29 +36,30 @@ class ApplicationContext {
     }
 }
 
-export function advancedPatternsExamples() {
+function advancedPatternsExamples() {
     console.log('=== Advanced Patterns Examples ===\n');
 
     const container = new Container();
 
     // 1. Complex dependency graph
-    container.registerDependencies(EventEmitter, []);
-    container.registerDependencies(ApplicationContext, [EventEmitter, Object, Object]);
-
-    // Register configuration
-    container.offsetSet('config', {
-        name: 'My App',
-        version: '2.0.0',
-        environment: 'development'
-    });
-
-    // Register logger
-    const loggerFactory = (c: Container) => ({
-        log: (message: string) => console.log(`[${new Date().toISOString()}] ${message}`),
-        error: (message: string) => console.error(`[ERROR] ${message}`),
-        warn: (message: string) => console.warn(`[WARN] ${message}`)
-    });
-    container.offsetSet('logger', loggerFactory);
+    container.offsetSet('EventEmitter', () => new EventEmitter(), true);
+    container.offsetSet('ApplicationContext', (c: Container) => {
+        const logger = {
+            log: (message: string) => console.log(`[${new Date().toISOString()}] ${message}`),
+            error: (message: string) => console.error(`[ERROR] ${message}`),
+            warn: (message: string) => console.warn(`[WARN] ${message}`)
+        };
+        const config = {
+            name: 'My App',
+            version: '2.0.0',
+            environment: 'development'
+        };
+        return new ApplicationContext(
+            c.offsetGet(EventEmitter),
+            config,
+            logger,
+        )}
+    , true);
 
     // 2. Event-driven architecture
     const appContext = container.offsetGet(ApplicationContext);
@@ -107,4 +108,6 @@ export function advancedPatternsExamples() {
     console.log('Service 1 ID:', service1.id);
     console.log('Service 2 ID:', service2.id);
     console.log('Different instances:', service1.id !== service2.id);
-} 
+}
+
+advancedPatternsExamples();

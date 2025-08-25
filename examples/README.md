@@ -12,11 +12,11 @@ This directory contains comprehensive examples demonstrating various use cases o
 - Container management operations
 
 ### 2. Dependency Injection (`dependency-injection.ts`)
-- Manual dependency registration
+- Manual dependency binding
 - Auto-wiring with constructor injection
 - Singleton behavior
 - Circular dependency detection
-- Dependency registration by name
+- Dependency binding by name
 
 ### 3. Factories and Protection (`factories-and-protection.ts`)
 - Factory functions (new instance each time)
@@ -48,11 +48,10 @@ This directory contains comprehensive examples demonstrating various use cases o
 
 ```bash
 # Run all examples
-npm run examples
+pnpm run examples
 
-# Or run individual examples
-npx ts-node examples/basic-usage.ts
-npx ts-node examples/dependency-injection.ts
+# Run a specific example
+npx ts-node examples/[example-name].ts
 ```
 
 ## Key Concepts Demonstrated

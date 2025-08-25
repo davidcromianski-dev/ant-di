@@ -33,8 +33,8 @@ export class Container {
     /** Array of all registered keys */
     private _keys: string[] = [];
 
-    /** Manual dependency registration map for constructors */
-    private dependencyMap = new Map<Function, any[]>();
+    /** Manual dependency registration map for constructors and class names */
+    private dependencyMap = new Map<Function | string, any[]>();
 
     /**
      * Creates a new container instance with optional initial values.
@@ -68,34 +68,26 @@ export class Container {
     }
 
     /**
-     * Registers dependencies for a constructor function manually.
-     * @param constructor - The constructor function to register dependencies for
+     * Binds dependencies for a constructor function or class name.
+     * @param target - The constructor function or class name string to bind dependencies for
      * @param dependencies - Array of dependency types/constructors
      */
-    registerDependencies(constructor: Function, dependencies: any[]): void {
-        this.dependencyMap.set(constructor, dependencies);
-    }
-
-    /**
-     * Registers dependencies for a class by its name.
-     * @param className - The name of the class to register dependencies for
-     * @param dependencies - Array of dependency types/constructors
-     */
-    registerDependenciesByName(className: string, dependencies: any[]): void {
-        this.dependencyMap.set(className as any, dependencies);
+    bind(target: Function | string, dependencies: any[]): void {
+        this.dependencyMap.set(target, dependencies);
     }
 
     /**
      * Sets a value or service in the container.
      * @param key - The key to associate with the value
      * @param value - The value, factory function, or callable to store
+     * @param factory - Whether the value is a factory function
      * @throws {Error} If the key is frozen and cannot be modified
      */
-    offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>): void {
+    offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory: boolean = false): void {
         if (this.frozen.has(key)) {
             throw new KeyFrozenError(key);
         }
-        this.values.set(key, value);
+        this.values.set(key, (factory) ? this.factory(value as Factory<T>) : value);
         if (!this._keys.includes(key)) {
             this._keys.push(key);
         }

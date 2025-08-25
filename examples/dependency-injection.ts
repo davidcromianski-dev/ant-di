@@ -35,18 +35,18 @@ class Logger {
     }
 }
 
-export function dependencyInjectionExamples() {
+function dependencyInjectionExamples() {
     console.log('=== Dependency Injection Examples ===\n');
 
     const container = new Container();
 
-    // 1. Manual dependency registration
-    container.registerDependencies(DatabaseConnection, [String]);
-    container.registerDependencies(UserRepository, [DatabaseConnection]);
-    container.registerDependencies(UserService, [UserRepository]);
+    container.offsetSet('DatabaseConnection', (c: Container) => new DatabaseConnection('postgresql://localhost:5432/mydb'), true);
 
-    // Register concrete values
-    container.offsetSet('connectionString', 'postgresql://localhost:5432/mydb');
+    // 1. Manual dependency registration
+    container.bind(DatabaseConnection, [String]);
+    container.bind(UserRepository, [DatabaseConnection]);
+    container.bind(UserService, [UserRepository]);
+
 
     // 2. Auto-wiring with constructor injection
     const userService = container.offsetGet(UserService);
@@ -57,8 +57,8 @@ export function dependencyInjectionExamples() {
     const userService2 = container.offsetGet(UserService);
     console.log('\nSingleton check:', userService1 === userService2);
 
-    // 4. Dependency registration by name
-    container.registerDependenciesByName('Logger', []);
+    // 4. Dependency binding by name
+    container.bind('Logger', []);
     const logger = container.offsetGet(Logger);
     logger.log('Application started');
 
@@ -71,8 +71,8 @@ export function dependencyInjectionExamples() {
         constructor(public serviceA: ServiceA) {}
     }
 
-    container.registerDependencies(ServiceA, [ServiceB]);
-    container.registerDependencies(ServiceB, [ServiceA]);
+    container.bind(ServiceA, [ServiceB]);
+    container.bind(ServiceB, [ServiceA]);
 
     console.log('\nCircular dependency test:');
     try {
@@ -81,3 +81,5 @@ export function dependencyInjectionExamples() {
         console.log('Caught circular dependency:', error.message);
     }
 } 
+
+dependencyInjectionExamples();

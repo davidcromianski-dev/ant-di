@@ -1,6 +1,6 @@
 {
   "name": "@davidcromianski-dev/ant-di",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "author": {
     "name": "David Cromianski",
     "email": "davidcromianski.dev@gmail.com"
@@ -32,7 +32,8 @@
   "scripts": {
     "build": "vite build",
     "prepublishOnly": "pnpm build",
-    "test": "poku"
+    "test": "poku",
+    "examples": "npx ts-node examples/examples.ts"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

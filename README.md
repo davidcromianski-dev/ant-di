@@ -65,7 +65,7 @@ class UserService {
     constructor(private db: DatabaseConnection) {}
 }
 
-container.registerDependencies(UserService, [DatabaseConnection]);
+container.bind(UserService, [DatabaseConnection]);
 const userService = container.offsetGet(UserService);
 ```
 
@@ -97,12 +97,18 @@ To register services in the container, you can use the `offsetSet` method:
 // Simple value
 container.offsetSet('app.name', 'My Application');
 
-// Factory function
+// Factory function (traditional method)
 container.offsetSet('database', () => new DatabaseConnection());
+
+// Factory function (new direct method)
+container.offsetSet('database', () => new DatabaseConnection(), true);
 
 // Class constructor
 container.offsetSet('logger', Logger);
 ```
+
+> [!NOTE]
+> The third parameter `factory` (default: false) allows you to directly register a function as a factory without calling `container.factory()` first. When `factory=true`, the function will be executed each time the service is requested.
 
 #### Getting Services
 To get services from the container, you can use the `offsetGet` method:
@@ -147,26 +153,26 @@ class UserService {
 }
 
 // Register dependencies manually
-container.registerDependencies(UserService, [DatabaseConnection, Logger]);
+container.bind(UserService, [DatabaseConnection, Logger]);
 
 // Get instance with auto-wired dependencies
 const userService = container.offsetGet(UserService);
 ```
 
-#### Dependency Registration by Name
+#### Dependency Binding by Name
 
-For cases where you need to register dependencies using class names as strings (useful for dynamic registration or avoiding circular import issues):
+For cases where you need to bind dependencies using class names as strings (useful for dynamic registration or avoiding circular import issues):
 
 ```typescript
-// Alternative registration method using class name
-container.registerDependenciesByName('UserService', [DatabaseConnection, Logger]);
+// Alternative binding method using class name
+container.bind('UserService', [DatabaseConnection, Logger]);
 
-// Both registration methods achieve the same result
+// Both binding methods achieve the same result
 const userService = container.offsetGet(UserService);
 ```
 
 > [!TIP]
-> `registerDependenciesByName()` is particularly useful when dealing with dynamic class loading or when you want to avoid potential circular import issues in complex applications.
+> The `bind()` method accepts both constructor functions and class name strings, making it flexible for various use cases including dynamic class loading or avoiding potential circular import issues in complex applications.
 
 #### Circular Dependency Detection
 
@@ -180,20 +186,30 @@ class ServiceB {
 }
 
 // This will throw a circular dependency error
-container.registerDependencies(ServiceA, [ServiceB]);
-container.registerDependencies(ServiceB, [ServiceA]);
+    container.bind(ServiceA, [ServiceB]);
+    container.bind(ServiceB, [ServiceA]);
 ```
 
 ### Factory and Protection
 
 #### Registering Factories
-To register factories in the container, you can use the `factory` method:
+To register factories in the container, you can use either the `factory` method or the new direct `offsetSet` method:
 
+**Method 1: Using the `factory` method (traditional)**
 ```typescript
 const factory = (c: Container) => new Service();
 container.factory(factory);
 container.offsetSet('service', factory);
 ```
+
+**Method 2: Using `offsetSet` with factory parameter (new)**
+```typescript
+const factory = (c: Container) => new Service();
+container.offsetSet('service', factory, true); // true = register as factory
+```
+
+> [!TIP]
+> Both methods are equivalent. The new `offsetSet` method with `factory=true` provides a more direct way to register factories without needing to call `factory()` first.
 
 > [!TIP]
 > Useful for services that need to be created every time they are requested.
@@ -285,7 +301,7 @@ class DatabaseService {
 }
 
 // Register the class
-container.registerDependencies(DatabaseService, []);
+    container.bind(DatabaseService, []);
 
 // First access - creates instance
 const db1 = container.offsetGet(DatabaseService); // "DatabaseService created"
@@ -415,7 +431,7 @@ new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 #### Methods
 
 ##### Core Container Operations
-- `offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>): void` - Register a value, factory, or callable in the container
+- `offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory?: boolean): void` - Register a value, factory, or callable in the container. The optional `factory` parameter (default: false) allows direct factory registration when set to true.
 - `offsetGet<T>(key: string | Constructor<T>, resolutionPath?: string[]): T` - Retrieve a service by key or class constructor with auto-wiring
 - `offsetExists(key: string): boolean` - Check if a key exists in the container
 - `offsetUnset(key: string): void` - Remove a key from the container
@@ -432,8 +448,7 @@ new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 - `register(provider: IServiceProvider, values?: Record<string, ValueOrFactoryOrCallable<any>>): Container` - Register a service provider with optional additional values
 
 ##### Dependency Injection
-- `registerDependencies(constructor: Function, dependencies: any[]): void` - Register dependencies for a class constructor
-- `registerDependenciesByName(className: string, dependencies: any[]): void` - Register dependencies using class name as string
+- `bind(target: Function | string, dependencies: any[]): void` - Bind dependencies for a class constructor or class name string
 
 ## Contributing
 

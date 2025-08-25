@@ -40,7 +40,7 @@ class CacheServiceProvider implements IServiceProvider {
     }
 }
 
-export function serviceProviderExamples() {
+function serviceProviderExamples() {
     console.log('=== Service Provider Examples ===\n');
 
     const container = new Container();
@@ -73,3 +73,5 @@ export function serviceProviderExamples() {
     console.log('Environment:', container.offsetGet('app.environment'));
     console.log('Debug:', container.offsetGet('app.debug'));
 } 
+
+serviceProviderExamples();

@@ -48,6 +48,6 @@ export class FailedToResolveDueToUndefinedParamError extends Error {
 
 export class NoDependenciesRegisteredError extends Error {
     constructor(className: string) {
-        super(`No dependencies registered for ${className}. Use container.registerDependencies(${className}, [dependencies]) to register dependencies manually.`);
+        super(`No dependencies registered for ${className}. Use container.bind(${className}, [dependencies]) to register dependencies manually.`);
     }
 }
