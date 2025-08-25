@@ -1,26 +1,17 @@
 import { IServiceProvider, Factory, Callable, ValueOrFactoryOrCallable } from './interfaces';
-import enUsMessages from './i18n/en-us';
-import ptBrMessages from './i18n/pt-br';
-import esEsMessages from './i18n/es-es';
+import {
+    AutoWiringError,
+    CircularDependencyError, ExpectInvokableError, FailedToResolveDependencyError,
+    FailedToResolveDueToUndefinedParamError,
+    KeyFrozenError, KeyIsNotDefinedError,
+    NoDependenciesRegisteredError
+} from "./errors/Errors";
 
 /**
  * Dependency injection container that supports auto-wiring, factories, and service providers.
  * Implements a Pimple-like interface with additional features for TypeScript.
  */
 export class Container {
-    /** Available language packs for internationalization */
-    static langs = {
-        'en-us': enUsMessages,
-        'pt-br': ptBrMessages,
-        'es-es': esEsMessages
-    };
-
-    /** Current language setting */
-    private currentLang: string = 'en-us';
-
-    /** Localized message functions for the current language */
-    private localizedMessages = enUsMessages;
-
     /** Map of string keys to their corresponding values/services */
     private values = new Map<string, any>();
 
@@ -95,27 +86,6 @@ export class Container {
     }
 
     /**
-     * Sets the language for localized error messages.
-     * @param lang - The language code to set
-     */
-    public async setLanguage(lang: keyof typeof Container.langs): Promise<void> {
-        if (Container.langs[lang]) {
-            this.localizedMessages = Container.langs[lang];
-            this.currentLang = lang;
-        } else {
-            console.warn(this.localizedMessages.languageNotSupported(lang, this.currentLang));
-        }
-    }
-
-    /**
-     * Gets the current language setting.
-     * @returns The current language code
-     */
-    public getLanguage(): keyof typeof Container.langs {
-        return this.currentLang as keyof typeof Container.langs;
-    }
-
-    /**
      * Sets a value or service in the container.
      * @param key - The key to associate with the value
      * @param value - The value, factory function, or callable to store
@@ -123,7 +93,7 @@ export class Container {
      */
     offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>): void {
         if (this.frozen.has(key)) {
-            throw new Error(this.localizedMessages.keyFrozen(key));
+            throw new KeyFrozenError(key);
         }
         this.values.set(key, value);
         if (!this._keys.includes(key)) {
@@ -141,7 +111,7 @@ export class Container {
     private _autoWire<T>(constructor: { new(...args: any[]): T }, resolutionPath: string[]): T {
         const constructorName = constructor.name;
         if (resolutionPath.includes(constructorName)) {
-            throw new Error(this.localizedMessages.circularDependency(resolutionPath.join(' -> '), constructorName));
+            throw new CircularDependencyError(resolutionPath.join(' -> '), constructorName);
         }
         resolutionPath.push(constructorName);
         
@@ -151,7 +121,7 @@ export class Container {
         } else if (this.dependencyMap.has(constructorName as any)) {
             paramTypes = this.dependencyMap.get(constructorName as any) || [];
         } else {
-            throw new Error(this.localizedMessages.noDependenciesRegistered(constructorName));
+            throw new NoDependenciesRegisteredError(constructorName);
         }
         
         if (!paramTypes || paramTypes.length === 0) {
@@ -162,13 +132,13 @@ export class Container {
         const resolvedParams = paramTypes.map(paramType => {
             if (paramType === undefined) {
                 resolutionPath.pop();
-                throw new Error(this.localizedMessages.failedToResolveDueToUndefinedParam(constructorName));
+                throw new FailedToResolveDueToUndefinedParamError(constructorName);
             }
             try {
                 return this.offsetGet(paramType, [...resolutionPath]);
             } catch (e) {
                 resolutionPath.pop();
-                throw new Error(this.localizedMessages.failedToResolveDependency(paramType?.name || 'unknown', constructorName, (e as Error).message));
+                throw new FailedToResolveDependencyError(paramType?.name || 'unknown', constructorName, (e as Error).message);
             }
         });
         const instance = new constructor(...resolvedParams);
@@ -222,11 +192,10 @@ export class Container {
                     }
                     return instance;
                 } catch (e) {
-                    throw new Error(this.localizedMessages.autoWiringFailed(key.name, (e as Error).message));
+                    throw new AutoWiringError(key.name, (e as Error).message);
                 }
             }
-
-            throw new Error(this.localizedMessages.keyIsNotDefined(key.name));
+            throw new KeyIsNotDefinedError(key.name);
         } else {
             const cacheKey = key;
             if (this.values.has(cacheKey)) {
@@ -252,8 +221,7 @@ export class Container {
                 }
                 return cachedValue as T;
             }
-
-            throw new Error(this.localizedMessages.keyIsNotDefined(cacheKey));
+            throw new KeyIsNotDefinedError(cacheKey);
         }
     }
 
@@ -292,7 +260,7 @@ export class Container {
      */
     factory<T>(factory: Factory<T>): Factory<T> {
         if (typeof factory !== 'function') {
-            throw new Error(this.localizedMessages.expectedInvokable);
+            throw new ExpectInvokableError();
         }
         this.factories.set(factory, true);
         return factory;
@@ -306,7 +274,7 @@ export class Container {
      */
     protect(callable: Callable): Callable {
         if (typeof callable !== 'function') {
-            throw new Error(this.localizedMessages.expectedInvokable);
+            throw new ExpectInvokableError();
         }
         this.protected.set(callable, true);
         return callable;
@@ -320,7 +288,7 @@ export class Container {
      */
     raw<T>(key: string): T {
         if (!this.values.has(key) && !this._raw.has(key)) {
-            throw new Error(this.localizedMessages.keyIsNotDefined(key));
+            throw new KeyIsNotDefinedError(key);
         }
         if (this._raw.has(key)) {
             return this._raw.get(key) as T;

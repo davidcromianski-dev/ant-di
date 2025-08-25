@@ -1,6 +1,6 @@
 {
   "name": "@davidcromianski-dev/ant-di",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": {
     "name": "David Cromianski",
     "email": "davidcromianski.dev@gmail.com"
@@ -10,9 +10,9 @@
   "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.cjs.js",
-      "types": "./dist/types/index.d.ts"
+      "require": "./dist/index.cjs.js"
     }
   },
   "files": [
@@ -35,12 +35,12 @@
     "test": "poku"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.3.0",
     "poku": "^3.0.2",
     "ts-node": "^10.9.2",
-    "tsx": "^4.20.3",
-    "typescript": "^5.7.2",
-    "vite": "^4.5.5",
-    "vite-plugin-dts": "^4.3.0"
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "^4.5.4"
   }
 }

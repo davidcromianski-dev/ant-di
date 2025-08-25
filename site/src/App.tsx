@@ -45,11 +45,6 @@ function App() {
       description: "Extremamente leve, sem conflitos de versão ou dependências externas"
     },
     {
-      icon: <Globe className="h-6 w-6" />,
-      title: "Internacionalização",
-      description: "Suporte nativo a múltiplos idiomas (EN, PT-BR, ES)"
-    },
-    {
       icon: <Code className="h-6 w-6" />,
       title: "Auto-wiring Manual",
       description: "Controle total sobre a resolução de dependências"
@@ -86,7 +81,6 @@ function App() {
       typeSafety: "Manual",
       autoWiring: "Manual",
       decorators: false,
-      i18n: true,
       serviceProviders: true,
       circularDeps: false,
       lifecycleHooks: false,
@@ -100,7 +94,6 @@ function App() {
       typeSafety: "Excelente",
       autoWiring: "Automático",
       decorators: true,
-      i18n: false,
       serviceProviders: false,
       circularDeps: true,
       lifecycleHooks: true,
@@ -114,7 +107,6 @@ function App() {
       typeSafety: "Excelente",
       autoWiring: "Automático",
       decorators: true,
-      i18n: false,
       serviceProviders: false,
       circularDeps: true,
       lifecycleHooks: false,
@@ -128,7 +120,6 @@ function App() {
       typeSafety: "Limitado",
       autoWiring: "Por nome",
       decorators: false,
-      i18n: false,
       serviceProviders: false,
       circularDeps: false,
       lifecycleHooks: false,
@@ -142,7 +133,6 @@ function App() {
       typeSafety: "Excelente",
       autoWiring: "Automático",
       decorators: true,
-      i18n: false,
       serviceProviders: false,
       circularDeps: true,
       lifecycleHooks: true,
@@ -294,7 +284,6 @@ function App() {
                 <th className="border border-border p-3 text-center font-semibold">Type Safety</th>
                 <th className="border border-border p-3 text-center font-semibold">Auto-wiring</th>
                 <th className="border border-border p-3 text-center font-semibold">Decorators</th>
-                <th className="border border-border p-3 text-center font-semibold">I18n</th>
                 <th className="border border-border p-3 text-center font-semibold">Service Providers</th>
                 <th className="border border-border p-3 text-center font-semibold">Testabilidade</th>
               </tr>
@@ -313,9 +302,6 @@ function App() {
                   <td className="border border-border p-3 text-center">{lib.autoWiring}</td>
                   <td className="border border-border p-3 text-center">
                     {lib.decorators ? '✅' : '❌'}
-                  </td>
-                  <td className="border border-border p-3 text-center">
-                    {lib.i18n ? '✅' : '❌'}
                   </td>
                   <td className="border border-border p-3 text-center">
                     {lib.serviceProviders ? '✅' : '❌'}

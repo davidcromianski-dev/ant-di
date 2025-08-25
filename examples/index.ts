@@ -2,7 +2,6 @@ import { basicUsageExamples } from './basic-usage';
 import { dependencyInjectionExamples } from './dependency-injection';
 import { factoriesAndProtectionExamples } from './factories-and-protection';
 import { serviceProviderExamples } from './service-providers';
-import { internationalizationExamples } from './internationalization';
 import { advancedPatternsExamples } from './advanced-patterns';
 
 /**
@@ -24,9 +23,6 @@ async function runAllExamples() {
         serviceProviderExamples();
         console.log('\n' + '='.repeat(50) + '\n');
         
-        await internationalizationExamples();
-        console.log('\n' + '='.repeat(50) + '\n');
-        
         advancedPatternsExamples();
         
         console.log('\n✅ All examples completed successfully!');
@@ -45,7 +41,6 @@ export {
     dependencyInjectionExamples,
     factoriesAndProtectionExamples,
     serviceProviderExamples,
-    internationalizationExamples,
     advancedPatternsExamples,
     runAllExamples
 }; 

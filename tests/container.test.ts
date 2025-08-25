@@ -264,32 +264,4 @@ describe('📦 Container', () => {
             assert.equal(container.offsetGet('service'), 'value');
         });
     });
-
-    describe('Internationalization', () => {
-        it('should handle language setting', async () => {
-            const container = new Container();
-            await container.setLanguage('en-us');
-            assert.equal(container.getLanguage(), 'en-us');
-        });
-
-        it('should handle unsupported language', async () => {
-            const container = new Container();
-
-            // Store original console.warn
-            const originalWarn = console.warn;
-            const warnCalls: string[] = [];
-
-            // Mock console.warn
-            console.warn = (message: string) => {
-                warnCalls.push(message);
-            };
-
-            await container.setLanguage('unsupported-lang' as keyof typeof Container.langs);
-
-            assert.equal(warnCalls.includes(`Language 'unsupported-lang' not supported. Keeping 'en-us'.`), true);
-
-            // Restore original console.warn
-            console.warn = originalWarn;
-        });
-    });
 });

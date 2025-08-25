@@ -273,43 +273,6 @@ const connection = container.offsetGet('db.connection');
 console.log(connection.connect());
 ```
 
-### Internationalization
-
-Ant DI supports multiple languages for error messages. Currently supported languages:
-- English (en-us) - Default
-- Portuguese (pt-br)
-- Spanish (es-es)
-
-```typescript
-// Set language
-await container.setLanguage('pt-br');
-
-// Get current language
-const currentLang = container.getLanguage();
-
-// Error messages will now be in Portuguese
-try {
-    container.offsetGet('nonexistent');
-} catch (error) {
-    console.log(error.message); // "A chave "nonexistent" não está definida."
-}
-```
-
-#### Available Error Messages
-
-The following error messages are localized across all supported languages:
-
-- **expectedInvokable** - When a callable is not a function or invokable object
-- **keyFrozen** - When attempting to modify a frozen key
-- **keyIsNotDefined** - When accessing a non-existent key
-- **circularDependency** - When circular dependencies are detected
-- **couldNotResolveForConstructor** - When dependencies cannot be resolved for a constructor
-- **failedToResolveDependency** - When a specific dependency fails to resolve
-- **autoWiringFailed** - When auto-wiring process fails
-- **failedToResolveDueToUndefinedParam** - When parameter type is undefined (circular dependencies)
-- **languageNotSupported** - When an unsupported language is requested
-- **noDependenciesRegistered** - When no dependencies are registered for a class
-
 ### Singleton Behavior & Instance Caching
 
 Ant DI automatically caches class instances to ensure singleton behavior:
@@ -376,7 +339,6 @@ Tests are organized into logical groups:
 - **Proxy Access** - Proxy functionality
 - **Constructor Initialization** - Container initialization
 - **Service Providers** - Service provider registration
-- **Internationalization** - Language support
 
 ### Example Test
 
@@ -472,10 +434,6 @@ new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 ##### Dependency Injection
 - `registerDependencies(constructor: Function, dependencies: any[]): void` - Register dependencies for a class constructor
 - `registerDependenciesByName(className: string, dependencies: any[]): void` - Register dependencies using class name as string
-
-##### Internationalization
-- `setLanguage(lang: keyof typeof Container.langs): Promise<void>` - Set the language for error messages (en-us, pt-br, es-es)
-- `getLanguage(): keyof typeof Container.langs` - Get the current language setting
 
 ## Contributing
 
