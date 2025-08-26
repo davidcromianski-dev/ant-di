@@ -2,7 +2,7 @@
 
 ## Simple JavaScript Dependency Injection Package
 
-This package is a simple dependency injection container for JavaScript and TypeScript. It is inspired by the PHP Pimple package and provides advanced features like wiring, service providers, and internationalization.
+This package is a simple dependency injection container for JavaScript and TypeScript. It is inspired by the PHP Pimple package and provides advanced features like wiring and service providers.
 
 ![ant-di](https://github.com/user-attachments/assets/ed38e310-6c24-4b7e-a90f-fc524c811393)
 
@@ -11,7 +11,6 @@ This package is a simple dependency injection container for JavaScript and TypeS
 - **Simple and lightweight** - Easy to use dependency injection container
 - **Auto-wiring** - Manual dependency resolution for TypeScript classes with automatic singleton caching
 - **Singleton behavior** - Automatic instance caching ensures classes return the same instance
-- **Internationalization** - Multi-language error messages (EN, PT-BR, ES)
 - **Factory support** - Create new instances on each request
 - **Protected callables** - Store functions without executing them
 - **Frozen keys** - Prevent modification after first resolution
