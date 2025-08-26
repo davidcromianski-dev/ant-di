@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/ant-di/static/css/main.57d70a3b.css",
-    "main.js": "/ant-di/static/js/main.18fa6b78.js",
+    "main.js": "/ant-di/static/js/main.bc309b6a.js",
     "index.html": "/ant-di/index.html",
     "main.57d70a3b.css.map": "/ant-di/static/css/main.57d70a3b.css.map",
-    "main.18fa6b78.js.map": "/ant-di/static/js/main.18fa6b78.js.map"
+    "main.bc309b6a.js.map": "/ant-di/static/js/main.bc309b6a.js.map"
   },
   "entrypoints": [
     "static/css/main.57d70a3b.css",
-    "static/js/main.18fa6b78.js"
+    "static/js/main.bc309b6a.js"
   ]
 }
