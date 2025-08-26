@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Zap,
-  Globe,
-  Code,
-  Package,
-  Github,
+import { 
+  Zap, 
+  Globe, 
+  Code, 
+  Package, 
+  Github, 
   BookOpen,
   CheckCircle,
   XCircle,
@@ -12,14 +12,22 @@ import {
   Sun,
   Moon,
   AlertTriangle,
-  Star
+  Star,
+  Copy,
+  Check
 } from 'lucide-react';
 import AntIcon from './components/AntIcon';
 import { useTheme } from './contexts/ThemeContext';
+import Prism from 'prismjs';
+import 'prismjs/themes/prism-tomorrow.css';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-javascript';
+import './code-highlight.css';
 
 function App() {
   const { theme, toggleTheme } = useTheme();
   const [starCount, setStarCount] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Buscar stars do GitHub
   useEffect(() => {
@@ -37,6 +45,58 @@ function App() {
 
     fetchStars();
   }, []);
+
+  // Highlight code blocks when component mounts
+  useEffect(() => {
+    Prism.highlightAll();
+  }, []);
+
+  const copyToClipboard = async () => {
+    const codeText = `import { Container } from '@davidcromianski-dev/ant-di';
+
+// Create container
+const container = new Container();
+
+// Register a service
+container.set('database', () => new DatabaseConnection());
+
+// Get the service
+const db = container.get('database');
+
+// Auto-wiring example
+class UserService {
+    constructor(private db: DatabaseConnection) {}
+}
+
+container.bind(UserService, [DatabaseConnection]);
+const userService = container.get(UserService);
+
+// Service provider example
+class DatabaseServiceProvider implements IServiceProvider {
+    register(container: Container) {
+        container.set('db.host', 'localhost');
+        container.set('db.port', 5432);
+        
+        const connectionFactory = (c: Container) => ({
+            host: c.get('db.host'),
+            port: c.get('db.port'),
+            connect: () => \`Connected to \${c.get('db.host')}:\${c.get('db.port')}\`
+        });
+        
+        container.set('db.connection', connectionFactory, true);
+    }
+}
+
+container.register(new DatabaseServiceProvider());`;
+
+    try {
+      await navigator.clipboard.writeText(codeText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
 
   const features = [
     {
@@ -283,14 +343,38 @@ function App() {
         <div className="max-w-4xl mx-auto">
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div className="flex flex-col space-y-1.5 p-6 border-b">
-              <h3 className="text-xl font-semibold leading-none tracking-tight">Exemplo Básico</h3>
-              <p className="text-sm text-muted-foreground">
-                Container de injeção de dependência com auto-wiring e service providers
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold leading-none tracking-tight">Exemplo Básico</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Container de injeção de dependência com auto-wiring e service providers
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-md">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-mono">TypeScript</span>
+                  <button
+                    onClick={copyToClipboard}
+                    className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                    title="Copy code to clipboard"
+                  >
+                    {copied ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="p-6">
-              <pre className="bg-muted rounded-lg p-4 overflow-x-auto text-sm">
-                <code className="text-foreground">
+              <div className="code-block">
+                <pre className="overflow-x-auto text-sm">
+                  <code className="language-typescript">
                   {`import { Container } from '@davidcromianski-dev/ant-di';
 
 // Create container
@@ -327,8 +411,9 @@ class DatabaseServiceProvider implements IServiceProvider {
 }
 
 container.register(new DatabaseServiceProvider());`}
-                </code>
-              </pre>
+                  </code>
+                </pre>
+              </div>
             </div>
           </div>
         </div>

@@ -1,0 +1,153 @@
+/* Custom Code Highlighting Styles */
+.code-block {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.code-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%);
+  border-bottom: 1px solid #6B7280;
+}
+
+.code-block::after {
+  content: '● ● ●';
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  color: #9CA3AF;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 40px 20px 20px 20px;
+  background: #1F2937;
+  border-radius: 8px;
+}
+
+.code-block code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #F9FAFB;
+}
+
+/* Prism.js Custom Theme Overrides */
+.code-block .token.keyword {
+  color: #F59E0B;
+  font-weight: 600;
+}
+
+.code-block .token.string {
+  color: #10B981;
+}
+
+.code-block .token.comment {
+  color: #6B7280;
+  font-style: italic;
+}
+
+.code-block .token.function {
+  color: #3B82F6;
+}
+
+.code-block .token.class-name {
+  color: #8B5CF6;
+}
+
+.code-block .token.number {
+  color: #EF4444;
+}
+
+.code-block .token.operator {
+  color: #F59E0B;
+}
+
+.code-block .token.punctuation {
+  color: #9CA3AF;
+}
+
+.code-block .token.property {
+  color: #10B981;
+}
+
+.code-block .token.variable {
+  color: #F9FAFB;
+}
+
+.code-block .token.parameter {
+  color: #F472B6;
+}
+
+/* Dark theme specific adjustments */
+.dark .code-block::before {
+  background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
+  border-bottom: 1px solid #4B5563;
+}
+
+.dark .code-block pre {
+  background: #111827;
+}
+
+/* Light theme adjustments */
+.light .code-block::before {
+  background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
+  border-bottom: 1px solid #9CA3AF;
+}
+
+.light .code-block pre {
+  background: #F9FAFB;
+}
+
+.light .code-block code {
+  color: #1F2937;
+}
+
+.light .code-block .token.comment {
+  color: #6B7280;
+}
+
+.light .code-block .token.variable {
+  color: #1F2937;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .code-block pre {
+    padding: 35px 15px 15px 15px;
+    font-size: 13px;
+  }
+  
+  .code-block::after {
+    left: 12px;
+    font-size: 10px;
+  }
+}
+
+/* Scrollbar styling */
+.code-block pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.code-block pre::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+.code-block pre::-webkit-scrollbar-thumb {
+  background: #6B7280;
+  border-radius: 4px;
+}
+
+.code-block pre::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
