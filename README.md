@@ -236,7 +236,7 @@ class UserService {
 container.bind(UserService, [DatabaseConnection, Logger]);
 
 // Get instance with auto-wired dependencies
-const userService = container.offsetGet(UserService);
+const userService = container.get(UserService);
 ```
 
 #### Dependency Binding by Name
@@ -248,7 +248,7 @@ For cases where you need to bind dependencies using class names as strings (usef
 container.bind('UserService', [DatabaseConnection, Logger]);
 
 // Both binding methods achieve the same result
-const userService = container.offsetGet(UserService);
+const userService = container.get(UserService);
 ```
 
 > [!TIP]
@@ -288,12 +288,6 @@ const factory = (c: Container) => new Service();
 container.set('service', factory, true); // true = register as factory
 ```
 
-**Method 3: Using `offsetSet` with factory parameter (legacy)**
-```typescript
-const factory = (c: Container) => new Service();
-container.offsetSet('service', factory, true); // true = register as factory
-```
-
 > [!TIP]
 > All three methods are equivalent. The `set` method with `factory=true` is the recommended approach as it provides a more direct way to register factories without needing to call `factory()` first.
 
@@ -321,7 +315,7 @@ Keys become frozen after first resolution of implicit factories:
 container.set('service', (c: Container) => new Service());
 
 // First access - works fine
-const service = container.offsetGet('service');
+const service = container.get('service');
 
 // Second access - throws error (key is frozen)
 container.set('service', 'new value'); // Error!
@@ -357,9 +351,9 @@ class DatabaseServiceProvider implements IServiceProvider {
         container.set('db.port', 5432);
         
         const connectionFactory = (c: Container) => ({
-            host: c.offsetGet('db.host'),
-            port: c.offsetGet('db.port'),
-            connect: () => `Connected to ${c.offsetGet('db.host')}:${c.offsetGet('db.port')}`
+            host: c.get('db.host'),
+            port: c.get('db.port'),
+            connect: () => `Connected to ${c.get('db.host')}:${c.get('db.port')}`
         });
         
         container.factory(connectionFactory);
@@ -371,7 +365,7 @@ class DatabaseServiceProvider implements IServiceProvider {
 container.register(new DatabaseServiceProvider());
 
 // Use the services
-const connection = container.offsetGet('db.connection');
+const connection = container.get('db.connection');
 console.log(connection.connect());
 ```
 
@@ -390,10 +384,10 @@ class DatabaseService {
 container.bind(DatabaseService, []);
 
 // First access - creates instance
-const db1 = container.offsetGet(DatabaseService); // "DatabaseService created"
+const db1 = container.get(DatabaseService); // "DatabaseService created"
 
 // Second access - returns cached instance
-const db2 = container.offsetGet(DatabaseService); // No log (cached)
+const db2 = container.get(DatabaseService); // No log (cached)
 
 console.log(db1 === db2); // true - same instance
 ```
@@ -453,7 +447,7 @@ describe('Container', () => {
         it('should set and get a value', () => {
             const container = new Container();
             container.set('key', 'value');
-            const value = container.offsetGet('key');
+            const value = container.get('key');
             assert.equal(value, 'value');
         });
     });
