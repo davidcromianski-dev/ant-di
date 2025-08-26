@@ -40,26 +40,25 @@ function dependencyInjectionExamples() {
 
     const container = new Container();
 
-    container.offsetSet('DatabaseConnection', (c: Container) => new DatabaseConnection('postgresql://localhost:5432/mydb'), true);
+    container.set('DatabaseConnection', (c: Container) => new DatabaseConnection('postgresql://localhost:5432/mydb'), true);
 
     // 1. Manual dependency registration
-    container.bind(DatabaseConnection, [String]);
+    container.bind(DatabaseConnection, []);
     container.bind(UserRepository, [DatabaseConnection]);
     container.bind(UserService, [UserRepository]);
 
-
     // 2. Auto-wiring with constructor injection
-    const userService = container.offsetGet(UserService);
+    const userService = container.get(UserService);
     console.log('User service result:', userService.getUser(123));
 
     // 3. Singleton behavior
-    const userService1 = container.offsetGet(UserService);
-    const userService2 = container.offsetGet(UserService);
+    const userService1 = container.get(UserService);
+    const userService2 = container.get(UserService);
     console.log('\nSingleton check:', userService1 === userService2);
 
-    // 4. Dependency binding by name
-    container.bind('Logger', []);
-    const logger = container.offsetGet(Logger);
+    // 4. Dependency binding by constructor function
+    container.bind(Logger, []);
+    const logger = container.get(Logger);
     logger.log('Application started');
 
     // 5. Circular dependency detection
@@ -72,11 +71,10 @@ function dependencyInjectionExamples() {
     }
 
     container.bind(ServiceA, [ServiceB]);
-    container.bind(ServiceB, [ServiceA]);
-
+    
     console.log('\nCircular dependency test:');
     try {
-        container.offsetGet(ServiceA);
+        container.bind(ServiceB, [ServiceA]);
     } catch (error: any) {
         console.log('Caught circular dependency:', error.message);
     }

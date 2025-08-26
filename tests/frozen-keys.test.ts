@@ -5,31 +5,31 @@ describe('📦 Container - Frozen Keys', () => {
     it('should handle frozen keys', () => {
         const container = new Container();
         
-        container.offsetSet('frozenKey', () => 'value');
+        container.set('frozenKey', () => 'value');
         
-        const result = container.offsetGet('frozenKey');
+        const result = container.get('frozenKey');
         assert.equal(result, 'value');
         
-        const result2 = container.offsetGet('frozenKey');
+        const result2 = container.get('frozenKey');
         assert.equal(result, result2);
         
-        assert.throws(() => container.offsetSet('frozenKey', 'newValue'), 'Key "frozenKey" is frozen.');
+        assert.throws(() => container.set('frozenKey', 'newValue'), 'Key "frozenKey" is frozen.');
         
-        assert.throws(() => container.offsetSet('frozenKey', () => 'anotherValue'), 'Key "frozenKey" is frozen.');
+        assert.throws(() => container.set('frozenKey', () => 'anotherValue'), 'Key "frozenKey" is frozen.');
     });
 
     it('should unfreeze keys when unset', () => {
         const container = new Container();
         
-        container.offsetSet('testKey', () => 'original');
-        container.offsetGet('testKey');
+        container.set('testKey', () => 'original');
+        container.get('testKey');
         
-        assert.throws(() => container.offsetSet('testKey', 'newValue'), 'Key "testKey" is frozen.');
+        assert.throws(() => container.set('testKey', 'newValue'), 'Key "testKey" is frozen.');
         
-        container.offsetUnset('testKey');
+        container.unset('testKey');
         
-        container.offsetSet('testKey', 'newValue');
-        assert.equal(container.offsetGet('testKey'), 'newValue');
+        container.set('testKey', 'newValue');
+        assert.equal(container.get('testKey'), 'newValue');
     });
 
     it('should not freeze explicit factories', () => {
@@ -37,13 +37,13 @@ describe('📦 Container - Frozen Keys', () => {
         
         const factory = (c: any) => 'factoryValue';
         container.factory(factory);
-        container.offsetSet('factoryKey', factory);
+        container.set('factoryKey', factory);
         
-        const result = container.offsetGet('factoryKey');
+        const result = container.get('factoryKey');
         assert.equal(result, 'factoryValue');
         
-        container.offsetSet('factoryKey', 'newValue');
-        assert.equal(container.offsetGet('factoryKey'), 'newValue');
+        container.set('factoryKey', 'newValue');
+        assert.equal(container.get('factoryKey'), 'newValue');
     });
 
     it('should not freeze protected callables', () => {
@@ -51,23 +51,23 @@ describe('📦 Container - Frozen Keys', () => {
         
         const protectedCallable = (c: any) => 'protectedValue';
         container.protect(protectedCallable);
-        container.offsetSet('protectedKey', protectedCallable);
+        container.set('protectedKey', protectedCallable);
         
-        const result = container.offsetGet('protectedKey');
+        const result = container.get('protectedKey');
         assert.equal(result, protectedCallable);
         
-        container.offsetSet('protectedKey', 'newValue');
-        assert.equal(container.offsetGet('protectedKey'), 'newValue');
+        container.set('protectedKey', 'newValue');
+        assert.equal(container.get('protectedKey'), 'newValue');
     });
 
     it('should freeze only after first resolution of implicit factories', () => {
         const container = new Container();
         
-        container.offsetSet('implicitKey', (c: any) => 'implicitValue');
+        container.set('implicitKey', (c: any) => 'implicitValue');
 
-        container.offsetSet('implicitKey', (c: any) => 'beforeAccess');
-        assert.equal(container.offsetGet('implicitKey'), 'beforeAccess');
+        container.set('implicitKey', (c: any) => 'beforeAccess');
+        assert.equal(container.get('implicitKey'), 'beforeAccess');
         
-        assert.throws(() => container.offsetSet('implicitKey', 'afterAccess'), 'Key "implicitKey" is frozen.');
+        assert.throws(() => container.set('implicitKey', 'afterAccess'), 'Key "implicitKey" is frozen.');
     });
 });

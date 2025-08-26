@@ -8,8 +8,8 @@ This directory contains the test files for the Container class, organized into l
 - **`container.test.ts`** - Main test file that imports all test modules
 
 ### Individual Test Modules
-- **`basic-operations.test.ts`** - Tests for basic container operations (set, get, exists, unset, keys)
-- **`factory-operations.test.ts`** - Tests for factory registration (both traditional and direct methods), protection, and raw value access
+- **`basic-operations.test.ts`** - Tests for basic container operations (set, get, exists, unset, keys, clear, dispose)
+- **`factory-operations.test.ts`** - Tests for factory registration (both traditional and direct methods), protection, raw value access, and new `set` method
 - **`auto-wiring.test.ts`** - Tests for dependency injection and auto-wiring functionality using the unified `bind` method
 - **`frozen-keys.test.ts`** - Tests for key freezing behavior and protection
 - **`proxy-access.test.ts`** - Tests for proxy-based property access

@@ -1,27 +1,29 @@
 import { Container } from '../src';
 
 /**
- * Advanced usage patterns and real-world scenarios
+ * Examples demonstrating advanced container patterns and real-world scenarios
  */
 
-// Event system
+// Event emitter for event-driven architecture
 class EventEmitter {
-    private listeners: Map<string, Function[]> = new Map();
+    private events: Map<string, Function[]> = new Map();
 
-    on(event: string, listener: Function) {
-        if (!this.listeners.has(event)) {
-            this.listeners.set(event, []);
+    on(event: string, callback: Function) {
+        if (!this.events.has(event)) {
+            this.events.set(event, []);
         }
-        this.listeners.get(event)!.push(listener);
+        this.events.get(event)!.push(callback);
     }
 
-    emit(event: string, data: any) {
-        const eventListeners = this.listeners.get(event) || [];
-        eventListeners.forEach(listener => listener(data));
+    emit(event: string, data?: any) {
+        const callbacks = this.events.get(event);
+        if (callbacks) {
+            callbacks.forEach(callback => callback(data));
+        }
     }
 }
 
-// Application context
+// Application context that manages services
 class ApplicationContext {
     constructor(
         private eventEmitter: EventEmitter,
@@ -31,8 +33,32 @@ class ApplicationContext {
 
     start() {
         this.logger.log('Application starting...');
-        this.eventEmitter.emit('app.start', this.config);
-        return 'Application started successfully';
+        this.eventEmitter.emit('app:started', { timestamp: new Date() });
+        this.logger.log('Application started successfully');
+    }
+
+    stop() {
+        this.logger.log('Application stopping...');
+        this.eventEmitter.emit('app:stopped', { timestamp: new Date() });
+        this.logger.log('Application stopped');
+    }
+}
+
+// Service with lifecycle management
+class LifecycleService {
+    public id: string;
+
+    constructor() {
+        this.id = Math.random().toString(36).substr(2, 9);
+        console.log(`LifecycleService ${this.id} created`);
+    }
+
+    init() {
+        console.log(`LifecycleService ${this.id} initialized`);
+    }
+
+    destroy() {
+        console.log(`LifecycleService ${this.id} destroyed`);
     }
 }
 
@@ -42,8 +68,8 @@ function advancedPatternsExamples() {
     const container = new Container();
 
     // 1. Complex dependency graph
-    container.offsetSet('EventEmitter', () => new EventEmitter(), true);
-    container.offsetSet('ApplicationContext', (c: Container) => {
+    container.set('EventEmitter', () => new EventEmitter(), true);
+    container.set('ApplicationContext', (c: Container) => {
         const logger = {
             log: (message: string) => console.log(`[${new Date().toISOString()}] ${message}`),
             error: (message: string) => console.error(`[ERROR] ${message}`),
@@ -62,49 +88,31 @@ function advancedPatternsExamples() {
     , true);
 
     // 2. Event-driven architecture
-    const appContext = container.offsetGet(ApplicationContext);
-    
-    // Set up event listeners
     const eventEmitter = container.offsetGet(EventEmitter);
-    eventEmitter.on('app.start', (config: any) => {
-        console.log(`Event: App starting with config:`, config);
+    const appContext = container.offsetGet(ApplicationContext);
+
+    // Subscribe to events
+    eventEmitter.on('app:started', (data: any) => {
+        console.log('Event received: app:started', data);
     });
 
-    console.log('Starting application:');
-    const result = appContext.start();
-
-    // 3. Proxy access pattern
-    console.log('\nProxy access:');
-    // @ts-ignore
-    container.proxyValue = 'Accessed via proxy';
-    // @ts-ignore
-    console.log('Proxy value:', container.proxyValue);
-
-    // 4. Container composition
-    const childContainer = new Container({
-        'child.service': 'Child service value'
+    eventEmitter.on('app:stopped', (data: any) => {
+        console.log('Event received: app:stopped', data);
     });
 
-    console.log('\nChild container:');
-    console.log('Child service:', childContainer.offsetGet('child.service'));
+    // Start the application
+    appContext.start();
 
-    // 5. Service lifecycle management
-    const lifecycleService = (c: Container) => {
-        const instance = {
-            id: Math.random().toString(36).substr(2, 9),
-            createdAt: new Date(),
-            destroy: () => console.log(`Destroying service ${instance.id}`)
-        };
-        console.log(`Creating service ${instance.id}`);
-        return instance;
-    };
+    // 3. Service lifecycle management
+    container.set('LifecycleService', () => new LifecycleService(), true);
 
-    container.factory(lifecycleService);
-    container.offsetSet('lifecycle', lifecycleService);
+    const service1 = container.get(LifecycleService);
+    const service2 = container.get(LifecycleService);
+
+    service1.init();
+    service2.init();
 
     console.log('\nService lifecycle:');
-    const service1 = container.offsetGet('lifecycle') as any;
-    const service2 = container.offsetGet('lifecycle') as any;
     console.log('Service 1 ID:', service1.id);
     console.log('Service 2 ID:', service2.id);
     console.log('Different instances:', service1.id !== service2.id);

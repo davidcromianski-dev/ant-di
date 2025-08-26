@@ -223,7 +223,7 @@ function App() {
             Inspirado no PHP Pimple com recursos avançados como auto-wiring, service providers e internacionalização.
           </p>
           
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center space-x-4">
             <a 
               href="https://github.com/davidcromianski-dev/ant-di"
               target="_blank"
@@ -233,6 +233,76 @@ function App() {
               <BookOpen className="h-4 w-4 mr-2" />
               Documentação
             </a>
+            <a 
+              href="#quick-start"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
+            >
+              <Code className="h-4 w-4 mr-2" />
+              Quick Start
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Start Section */}
+      <section id="quick-start" className="container mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold mb-4">Quick Start</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Comece a usar o Ant DI em poucos passos. Exemplo básico de configuração e uso.
+          </p>
+        </div>
+        
+        <div className="max-w-4xl mx-auto">
+          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+            <div className="flex flex-col space-y-1.5 p-6 border-b">
+              <h3 className="text-xl font-semibold leading-none tracking-tight">Exemplo Básico</h3>
+              <p className="text-sm text-muted-foreground">
+                Container de injeção de dependência com auto-wiring e service providers
+              </p>
+            </div>
+            <div className="p-6">
+              <pre className="bg-muted rounded-lg p-4 overflow-x-auto text-sm">
+                <code className="text-foreground">
+{`import { Container } from '@davidcromianski-dev/ant-di';
+
+// Create container
+const container = new Container();
+
+// Register a service
+container.set('database', () => new DatabaseConnection());
+
+// Get the service
+const db = container.get('database');
+
+// Auto-wiring example
+class UserService {
+    constructor(private db: DatabaseConnection) {}
+}
+
+container.bind(UserService, [DatabaseConnection]);
+const userService = container.get(UserService);
+
+// Service provider example
+class DatabaseServiceProvider implements IServiceProvider {
+    register(container: Container) {
+        container.set('db.host', 'localhost');
+        container.set('db.port', 5432);
+        
+        const connectionFactory = (c: Container) => ({
+            host: c.get('db.host'),
+            port: c.get('db.port'),
+            connect: () => \`Connected to \${c.get('db.host')}:\${c.get('db.port')}\`
+        });
+        
+        container.set('db.connection', connectionFactory, true);
+    }
+}
+
+container.register(new DatabaseServiceProvider());`}
+                </code>
+              </pre>
+            </div>
           </div>
         </div>
       </section>

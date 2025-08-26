@@ -78,10 +78,10 @@ import { Container } from '@davidcromianski-dev/ant-di';
 const container = new Container();
 
 // Register a service
-container.offsetSet('database', () => new DatabaseConnection());
+container.set('database', () => new DatabaseConnection());
 
 // Get the service
-const db = container.offsetGet('database');
+const db = container.get('database');
 
 // Auto-wiring example
 class UserService {
@@ -89,7 +89,7 @@ class UserService {
 }
 
 container.bind(UserService, [DatabaseConnection]);
-const userService = container.offsetGet(UserService);
+const userService = container.get(UserService);
 ```
 
 ## Container
@@ -114,54 +114,112 @@ const container = new Container({
 ### Basic Operations
 
 #### Registering Services
-To register services in the container, you can use the `offsetSet` method:
+To register services in the container, you can use either the `set` method (recommended) or `offsetSet` method:
 
 ```typescript
 // Simple value
-container.offsetSet('app.name', 'My Application');
+container.set('app.name', 'My Application');
 
 // Factory function (traditional method)
-container.offsetSet('database', () => new DatabaseConnection());
+container.set('database', () => new DatabaseConnection());
 
-// Factory function (new direct method)
-container.offsetSet('database', () => new DatabaseConnection(), true);
+// Factory function (direct method)
+container.set('database', () => new DatabaseConnection(), true);
 
 // Class constructor
-container.offsetSet('logger', Logger);
+container.set('logger', Logger);
+
+// Legacy method (still supported)
+container.offsetSet('app.name', 'My Application');
 ```
 
 > [!NOTE]
+> The `set` method is the recommended way to register services. The `offsetSet` method is maintained for backward compatibility.
+>
 > The third parameter `factory` (default: false) allows you to directly register a function as a factory without calling `container.factory()` first. When `factory=true`, the function will be executed each time the service is requested.
 
 #### Getting Services
-To get services from the container, you can use the `offsetGet` method:
+To get services from the container, you can use the `get` method:
 
 ```typescript
 // Get by string key
-const appName = container.offsetGet('app.name');
+const appName = container.get('app.name');
 
 // Get by class constructor (auto-wiring)
-const logger = container.offsetGet(Logger);
+const logger = container.get(Logger);
 ```
+
+### Container Management
+The container provides methods for managing its lifecycle:
+
+```typescript
+// Clear all registered services
+container.clear();
+
+// Dispose of the container (calls clear internally)
+container.dispose();
+```
+
+> [!TIP]
+> Use `clear()` when you want to reset the container to its initial state, and `dispose()` when you're completely done with the container instance.
 
 > [!NOTE]
 > If the service is a factory, it will be executed every time it is requested.
+
+### Version Compatibility
+
+#### Version 3.0.0+ (Current)
+The following methods are the **recommended** way to interact with the container:
+
+```typescript
+// Service registration
+container.set('key', value);
+container.set('key', factory, true);
+
+// Service retrieval
+container.get('key');
+container.get(Constructor);
+
+// Service management
+container.has('key');
+container.unset('key');
+```
+
+#### Version < 3.0.0 (Legacy)
+The following methods are **deprecated** but still supported for backward compatibility:
+
+```typescript
+// Deprecated methods (still work, but not recommended)
+container.offsetSet('key', value);
+container.offsetGet('key');
+container.offsetExists('key');
+container.offsetUnset('key');
+```
+
+> [!IMPORTANT]
+> **Migration Guide**: All deprecated methods now internally call their modern equivalents:
+> - `offsetSet()` → `set()`
+> - `offsetGet()` → `get()`
+> - `offsetExists()` → `has()`
+> - `offsetUnset()` → `unset()`
+>
+> Your existing code will continue to work, but consider migrating to the new methods for better maintainability.
 
 > [!CAUTION]
 > If the service is not in the container, an exception will be thrown.
 
 #### Checking Service Existence
-To check if a service is registered in the container, you can use the `offsetExists` method:
+To check if a service is registered in the container, you can use the `has` method:
 
 ```typescript
-const exists = container.offsetExists('service');
+const exists = container.has('service');
 ```
 
 #### Removing Services
-To remove services from the container, you can use the `offsetUnset` method:
+To remove services from the container, you can use the `unset` method:
 
 ```typescript
-container.offsetUnset('service');
+container.unset('service');
 ```
 
 ### Auto-wiring
@@ -209,30 +267,36 @@ class ServiceB {
 }
 
 // This will throw a circular dependency error
-    container.bind(ServiceA, [ServiceB]);
-    container.bind(ServiceB, [ServiceA]);
+container.bind(ServiceA, [ServiceB]);
+container.bind(ServiceB, [ServiceA]);
 ```
 
 ### Factory and Protection
 
 #### Registering Factories
-To register factories in the container, you can use either the `factory` method or the new direct `offsetSet` method:
+To register factories in the container, you can use multiple methods:
 
 **Method 1: Using the `factory` method (traditional)**
 ```typescript
 const factory = (c: Container) => new Service();
 container.factory(factory);
-container.offsetSet('service', factory);
+container.set('service', factory);
 ```
 
-**Method 2: Using `offsetSet` with factory parameter (new)**
+**Method 2: Using `set` with factory parameter (recommended)**
+```typescript
+const factory = (c: Container) => new Service();
+container.set('service', factory, true); // true = register as factory
+```
+
+**Method 3: Using `offsetSet` with factory parameter (legacy)**
 ```typescript
 const factory = (c: Container) => new Service();
 container.offsetSet('service', factory, true); // true = register as factory
 ```
 
 > [!TIP]
-> Both methods are equivalent. The new `offsetSet` method with `factory=true` provides a more direct way to register factories without needing to call `factory()` first.
+> All three methods are equivalent. The `set` method with `factory=true` is the recommended approach as it provides a more direct way to register factories without needing to call `factory()` first.
 
 > [!TIP]
 > Useful for services that need to be created every time they are requested.
@@ -243,7 +307,7 @@ To protect services in the container, you can use the `protect` method:
 ```typescript
 const callable = (c: Container) => new Service();
 container.protect(callable);
-container.offsetSet('service', callable);
+container.set('service', callable);
 ```
 
 > [!TIP]
@@ -255,13 +319,13 @@ Keys become frozen after first resolution of implicit factories:
 
 ```typescript
 // This creates an implicit factory
-container.offsetSet('service', (c: Container) => new Service());
+container.set('service', (c: Container) => new Service());
 
 // First access - works fine
 const service = container.offsetGet('service');
 
 // Second access - throws error (key is frozen)
-container.offsetSet('service', 'new value'); // Error!
+container.set('service', 'new value'); // Error!
 ```
 
 ### Getting Raw Values
@@ -290,8 +354,8 @@ import { Container, IServiceProvider } from '@davidcromianski-dev/ant-di';
 
 class DatabaseServiceProvider implements IServiceProvider {
     register(container: Container) {
-        container.offsetSet('db.host', 'localhost');
-        container.offsetSet('db.port', 5432);
+        container.set('db.host', 'localhost');
+        container.set('db.port', 5432);
         
         const connectionFactory = (c: Container) => ({
             host: c.offsetGet('db.host'),
@@ -300,7 +364,7 @@ class DatabaseServiceProvider implements IServiceProvider {
         });
         
         container.factory(connectionFactory);
-        container.offsetSet('db.connection', connectionFactory);
+        container.set('db.connection', connectionFactory);
     }
 }
 
@@ -324,7 +388,7 @@ class DatabaseService {
 }
 
 // Register the class
-    container.bind(DatabaseService, []);
+container.bind(DatabaseService, []);
 
 // First access - creates instance
 const db1 = container.offsetGet(DatabaseService); // "DatabaseService created"
@@ -382,14 +446,14 @@ Tests are organized into logical groups:
 ### Example Test
 
 ```typescript
-import { test, assert } from 'poku';
+import { describe, it, assert } from 'poku';
 import { Container } from '../src';
 
 describe('Container', () => {
     describe('Basic Operations', () => {
         it('should set and get a value', () => {
             const container = new Container();
-            container.offsetSet('key', 'value');
+            container.set('key', 'value');
             const value = container.offsetGet('key');
             assert.equal(value, 'value');
         });
@@ -448,10 +512,16 @@ new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 #### Methods
 
 ##### Core Container Operations
-- `offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory?: boolean): void` - Register a value, factory, or callable in the container. The optional `factory` parameter (default: false) allows direct factory registration when set to true.
-- `offsetGet<T>(key: string | Constructor<T>, resolutionPath?: string[]): T` - Retrieve a service by key or class constructor with auto-wiring
-- `offsetExists(key: string): boolean` - Check if a key exists in the container
-- `offsetUnset(key: string): void` - Remove a key from the container
+- `set<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory?: boolean): void` - **Recommended method** to register a value, factory, or callable in the container. The optional `factory` parameter (default: false) allows direct factory registration when set to true.
+- `get<T>(key: string | Constructor<T>): T` - **Recommended method** to retrieve a service by key or class constructor with auto-wiring
+- `has(key: string): boolean` - **Recommended method** to check if a key exists in the container
+- `unset(key: string): void` - **Recommended method** to remove a key from the container
+
+##### Legacy Methods (Deprecated since 3.0.0)
+- `offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory?: boolean): void` - **Deprecated**. Use `set()` instead.
+- `offsetGet<T>(key: string | Constructor<T>): T` - **Deprecated**. Use `get()` instead.
+- `offsetExists(key: string): boolean` - **Deprecated**. Use `has()` instead.
+- `offsetUnset(key: string): void` - **Deprecated**. Use `unset()` instead.
 
 ##### Factory and Protection
 - `factory<T>(factory: Factory<T>): Factory<T>` - Mark a factory to always create new instances (prevents singleton caching)
@@ -460,6 +530,8 @@ new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 ##### Utility Methods
 - `raw<T>(key: string): T` - Get the raw value without executing factories or callables
 - `keys(): string[]` - Get all registered keys in the container
+- `clear(): void` - Clear all registered services and reset the container to its initial state
+- `dispose(): void` - Dispose of the container and clean up resources
 
 ##### Service Providers
 - `register(provider: IServiceProvider, values?: Record<string, ValueOrFactoryOrCallable<any>>): Container` - Register a service provider with optional additional values

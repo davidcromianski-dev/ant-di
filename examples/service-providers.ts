@@ -7,36 +7,36 @@ import { Container, IServiceProvider } from '../src';
 // Service provider for database services
 class DatabaseServiceProvider implements IServiceProvider {
     register(container: Container): void {
-        container.offsetSet('db.host', 'localhost');
-        container.offsetSet('db.port', 5432);
-        container.offsetSet('db.name', 'myapp');
+        container.set('db.host', 'localhost');
+        container.set('db.port', 5432);
+        container.set('db.name', 'myapp');
         
         const connectionFactory = (c: Container) => ({
-            host: c.offsetGet('db.host'),
-            port: c.offsetGet('db.port'),
-            database: c.offsetGet('db.name'),
-            connect: () => `Connected to ${c.offsetGet('db.host')}:${c.offsetGet('db.port')}/${c.offsetGet('db.name')}`
+            host: c.get('db.host'),
+            port: c.get('db.port'),
+            database: c.get('db.name'),
+            connect: () => `Connected to ${c.get('db.host')}:${c.get('db.port')}/${c.get('db.name')}`
         });
         
         container.factory(connectionFactory);
-        container.offsetSet('db.connection', connectionFactory);
+        container.set('db.connection', connectionFactory);
     }
 }
 
 // Service provider for cache services
 class CacheServiceProvider implements IServiceProvider {
     register(container: Container): void {
-        container.offsetSet('cache.driver', 'redis');
-        container.offsetSet('cache.ttl', 3600);
+        container.set('cache.driver', 'redis');
+        container.set('cache.ttl', 3600);
         
         const cacheFactory = (c: Container) => ({
-            driver: c.offsetGet('cache.driver'),
-            ttl: c.offsetGet('cache.ttl'),
-            get: (key: string) => `Getting ${key} from ${c.offsetGet('cache.driver')}`,
-            set: (key: string, value: any) => `Setting ${key} = ${value} in ${c.offsetGet('cache.driver')}`
+            driver: c.get('cache.driver'),
+            ttl: c.get('cache.ttl'),
+            get: (key: string) => `Getting ${key} from ${c.get('cache.driver')}`,
+            set: (key: string, value: any) => `Setting ${key} = ${value} in ${c.get('cache.driver')}`
         });
         
-        container.offsetSet('cache', cacheFactory);
+        container.set('cache', cacheFactory);
     }
 }
 
@@ -51,14 +51,14 @@ function serviceProviderExamples() {
 
     // 2. Access services from providers
     console.log('Database services:');
-    console.log('Host:', container.offsetGet('db.host'));
-    console.log('Port:', container.offsetGet('db.port'));
+    console.log('Host:', container.get('db.host'));
+    console.log('Port:', container.get('db.port'));
     
-    const dbConnection = container.offsetGet('db.connection') as any;
+    const dbConnection = container.get('db.connection') as any;
     console.log('Connection:', dbConnection.connect());
 
     console.log('\nCache services:');
-    const cache = container.offsetGet('cache') as any;
+    const cache = container.get('cache') as any;
     console.log('Cache get:', cache.get('user:123'));
     console.log('Cache set:', cache.set('user:123', { name: 'John' }));
 
@@ -70,8 +70,8 @@ function serviceProviderExamples() {
 
     container.register(new DatabaseServiceProvider(), additionalValues);
     console.log('\nAdditional values:');
-    console.log('Environment:', container.offsetGet('app.environment'));
-    console.log('Debug:', container.offsetGet('app.debug'));
+    console.log('Environment:', container.get('app.environment'));
+    console.log('Debug:', container.get('app.debug'));
 } 
 
 serviceProviderExamples();

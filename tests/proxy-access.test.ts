@@ -4,7 +4,7 @@ import { Container } from '../src';
 describe('📦 Container - Proxy Access', () => {
     it('should handle proxy access', () => {
         const container = new Container();
-        container.offsetSet('testKey', 'testValue');
+        container.set('testKey', 'testValue');
 
         // Test proxy getter
         // @ts-ignore
@@ -13,6 +13,6 @@ describe('📦 Container - Proxy Access', () => {
         // Test proxy setter
         // @ts-ignore
         container.newKey = 'newValue';
-        assert.equal(container.offsetGet('newKey'), 'newValue');
+        assert.equal(container.get('newKey'), 'newValue');
     });
 });

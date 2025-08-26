@@ -6,11 +6,11 @@ describe('📦 Container - Service Providers', () => {
         const container = new Container();
         const provider: IServiceProvider = {
             register: (c: any) => {
-                c.offsetSet('service', 'value');
+                c.set('service', 'value');
             }
         };
 
         container.register(provider);
-        assert.equal(container.offsetGet('service'), 'value');
+        assert.equal(container.get('service'), 'value');
     });
 });

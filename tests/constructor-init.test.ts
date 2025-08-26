@@ -9,7 +9,7 @@ describe('📦 Container - Constructor Initialization', () => {
         };
 
         const container = new Container(initialValues);
-        assert.equal(container.offsetGet('key1'), 'value1');
-        assert.equal(container.offsetGet('key2'), 'value2');
+        assert.equal(container.get('key1'), 'value1');
+        assert.equal(container.get('key2'), 'value2');
     });
 });

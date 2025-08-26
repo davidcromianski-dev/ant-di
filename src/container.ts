@@ -1,11 +1,10 @@
-import { IServiceProvider, Factory, Callable, ValueOrFactoryOrCallable } from './interfaces';
 import {
-    AutoWiringError,
     CircularDependencyError, ExpectInvokableError, FailedToResolveDependencyError,
     FailedToResolveDueToUndefinedParamError,
     KeyFrozenError, KeyIsNotDefinedError,
     NoDependenciesRegisteredError
 } from "./errors/Errors";
+import { Callable, Constructor, Factory, IServiceProvider, ValueOrFactoryOrCallable } from './interfaces';
 
 /**
  * Dependency injection container that supports auto-wiring, factories, and service providers.
@@ -34,7 +33,7 @@ export class Container {
     private _keys: string[] = [];
 
     /** Manual dependency registration map for constructors and class names */
-    private dependencyMap = new Map<Function | string, any[]>();
+    private dependencyMap = new Map<Constructor<any>, Constructor<any>[]>();
 
     /**
      * Creates a new container instance with optional initial values.
@@ -45,21 +44,21 @@ export class Container {
         this.protected = new Map<Callable, boolean>();
 
         Object.entries(values).forEach(([key, value]) => {
-            this.offsetSet(key, value);
+            this.set(key, value);
         });
 
         return new Proxy(this, {
             get: (target, property) => {
                 if (typeof property === 'string') {
-                    if (target.offsetExists(property)) {
-                        return target.offsetGet(property);
+                    if (target.has(property)) {
+                        return target.get(property);
                     }
                 }
                 return target[property as keyof typeof target];
             },
             set: (target, property, value) => {
                 if (typeof property === 'string') {
-                    target.offsetSet(property, value);
+                    target.set(property, value);
                     return true;
                 }
                 return false;
@@ -67,29 +66,14 @@ export class Container {
         });
     }
 
-    /**
-     * Binds dependencies for a constructor function or class name.
-     * @param target - The constructor function or class name string to bind dependencies for
-     * @param dependencies - Array of dependency types/constructors
-     */
-    bind(target: Function | string, dependencies: any[]): void {
-        this.dependencyMap.set(target, dependencies);
-    }
-
-    /**
-     * Sets a value or service in the container.
-     * @param key - The key to associate with the value
-     * @param value - The value, factory function, or callable to store
-     * @param factory - Whether the value is a factory function
-     * @throws {Error} If the key is frozen and cannot be modified
-     */
-    offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory: boolean = false): void {
-        if (this.frozen.has(key)) {
-            throw new KeyFrozenError(key);
+    private _checkCircularDependency(target: Constructor<any>, dependencies: Constructor<any>[]): void {
+        if (dependencies.includes(target)) {
+            throw new CircularDependencyError(target.name, target.name);
         }
-        this.values.set(key, (factory) ? this.factory(value as Factory<T>) : value);
-        if (!this._keys.includes(key)) {
-            this._keys.push(key);
+        for (const dependency of dependencies) {
+            if (this.dependencyMap.has(dependency) && this.dependencyMap.get(dependency)?.includes(target)) {
+                throw new CircularDependencyError(target.name, dependency.name);
+            }
         }
     }
 
@@ -100,42 +84,95 @@ export class Container {
      * @returns A new instance of the class with dependencies injected
      * @throws {Error} If circular dependencies are detected or dependencies cannot be resolved
      */
-    private _autoWire<T>(constructor: { new(...args: any[]): T }, resolutionPath: string[]): T {
+    private _autoWire<T>(constructor: Constructor<any>): T {
         const constructorName = constructor.name;
-        if (resolutionPath.includes(constructorName)) {
-            throw new CircularDependencyError(resolutionPath.join(' -> '), constructorName);
-        }
-        resolutionPath.push(constructorName);
-        
-        let paramTypes: any[] = [];
-        if (this.dependencyMap.has(constructor)) {
-            paramTypes = this.dependencyMap.get(constructor) || [];
-        } else if (this.dependencyMap.has(constructorName as any)) {
-            paramTypes = this.dependencyMap.get(constructorName as any) || [];
-        } else {
+
+        if (!this.dependencyMap.has(constructor)) {
             throw new NoDependenciesRegisteredError(constructorName);
         }
-        
+
+        const paramTypes = this.dependencyMap.get(constructor) || [];
+
         if (!paramTypes || paramTypes.length === 0) {
-            resolutionPath.pop();
             return new constructor();
         }
-        
-        const resolvedParams = paramTypes.map(paramType => {
+
+        const resolvedParams = paramTypes.map((paramType) => {
             if (paramType === undefined) {
-                resolutionPath.pop();
                 throw new FailedToResolveDueToUndefinedParamError(constructorName);
             }
-            try {
-                return this.offsetGet(paramType, [...resolutionPath]);
-            } catch (e) {
-                resolutionPath.pop();
-                throw new FailedToResolveDependencyError(paramType?.name || 'unknown', constructorName, (e as Error).message);
+
+            if (typeof paramType === 'function' && 'name' in paramType) {
+                return this.get(paramType.name);
             }
-        });
-        const instance = new constructor(...resolvedParams);
-        resolutionPath.pop();
-        return instance;
+
+            throw new FailedToResolveDependencyError(paramType || 'unknown', constructorName);
+        }) as Function[];
+
+        return new constructor(...resolvedParams);
+    }
+
+    /**
+     * Binds dependencies for a constructor function or class name.
+     * @param target - The constructor function to bind dependencies for
+     * @param dependencies - Array of dependency types/constructors
+     */
+    bind<T>(target: Constructor<T>, dependencies: Constructor<any>[]): void {
+        if (typeof target !== 'function') {
+            throw new ExpectInvokableError();
+        }
+
+        if (dependencies.length > 0 && dependencies.some(dep => typeof dep !== 'function')) {
+            throw new ExpectInvokableError();
+        }
+
+        const key = target.name;
+        if (this.frozen.has(key)) {
+            throw new KeyFrozenError(key);
+        }
+
+        this._checkCircularDependency(target, dependencies);
+
+        this.dependencyMap.set(target, dependencies);
+        this.values.set(key, () => this._autoWire(target));
+
+        if (!this._keys.includes(key)) {
+            this._keys.push(key);
+        }
+    }
+
+    /**
+     * Sets a value or service in the container.
+     * @param key - The key to associate with the value
+     * @param value - The value, factory function, or callable to store
+     * @param factory - Whether the value is a factory function
+     * @throws {Error} If the key is frozen and cannot be modified
+     * @deprecated Since 3.0.0. Use set() instead.
+     */
+    offsetSet<T>(key: string | Constructor<any>, value: ValueOrFactoryOrCallable<T>, factory: boolean = false): void {
+        this.set(key, value, factory);
+    }
+
+    /**
+     * Sets a value or service in the container (alias for offsetSet for consistency).
+     * @param key - The key to associate with the value
+     * @param value - The value, factory function, or callable to store
+     * @param factory - Whether the value is a factory function
+     * @throws {Error} If the key is frozen and cannot be modified
+     */
+    set<T>(key: string | Constructor<any>, value: ValueOrFactoryOrCallable<T>, factory: boolean = false): void {
+        if (typeof key === 'function' && 'name' in key) {
+            key = (key as { name: string }).name;
+        }
+
+        if (this.frozen.has(key)) {
+            throw new KeyFrozenError(key);
+        }
+
+        this.values.set(key, (factory) ? this.factory(value as Factory<T>) : value);
+        if (!this._keys.includes(key)) {
+            this._keys.push(key);
+        }
     }
 
     /**
@@ -144,77 +181,55 @@ export class Container {
      * @param resolutionPath - Current resolution path for circular dependency detection
      * @returns The resolved value or service instance
      * @throws {Error} If the key is not defined or dependencies cannot be resolved
+     * @deprecated Since 3.0.0. Use get() instead.
      */
-    offsetGet<T>(key: string | { new(...args: any[]): T }, resolutionPath: string[] = []): T {
-        if (typeof key === 'function') {
-            if (this.classInstanceCache.has(key)) {
-                return this.classInstanceCache.get(key) as T;
-            }
+    offsetGet<T>(key: string | Constructor<T>): T {
+        return this.get(key);
+    }
 
-            const cacheKeyByName = key.name;
-            if (this.values.has(cacheKeyByName)) {
-                const valueByName = this.values.get(cacheKeyByName);
-                if (valueByName instanceof key) {
-                    this.classInstanceCache.set(key, valueByName);
-                    return valueByName as T;
+    /**
+     * Retrieves a value or service from the container.
+     * @param key - The key or constructor function to retrieve
+     * @returns The resolved value or service instance
+     * @throws {Error} If the key is not defined or dependencies cannot be resolved
+     */
+    get<T>(key: string | Constructor<T>): T {
+        const cacheKey = typeof key === 'function' ? key.name : key;
+        if (this.values.has(cacheKey)) {
+            const cachedValue = this.values.get(cacheKey);
+            const isProtected = this.protected.has(cachedValue);
+            if (this.factories.has(cachedValue)) {
+                if (isProtected) {
+                    return cachedValue as unknown as T;
                 }
-                if (this.factories.has(valueByName) && typeof valueByName === 'function') {
-                    if (!this.protected.has(valueByName)) {
-                        return valueByName(this) as T;
-                    } else {
-                        return valueByName as unknown as T;
-                    }
-                }
+                return cachedValue(this) as T;
             }
-
-            if (this.factories.has(key as unknown as Factory<any>)) {
-                const factoryFn = key as unknown as Factory<any>;
-                if (!this.protected.has(factoryFn)) {
-                    return factoryFn(this) as T;
+            if (typeof cachedValue === 'function') {
+                if (isProtected) {
+                    return cachedValue as unknown as T;
                 }
-                return factoryFn as unknown as T;
+                const result = cachedValue(this);
+                this.values.set(cacheKey, result);
+                if (!this._raw.has(cacheKey)) {
+                    this._raw.set(cacheKey, cachedValue as ValueOrFactoryOrCallable<any>);
+                }
+                this.frozen.set(cacheKey, true);
+                return result as T;
             }
-
-            if (typeof key.prototype !== 'undefined') {
-                try {
-                    const instance = this._autoWire(key as { new(...args: any[]): T }, resolutionPath);
-                    this.classInstanceCache.set(key, instance);
-                    if (!this._keys.includes(cacheKeyByName)) {
-                        this._keys.push(cacheKeyByName);
-                    }
-                    return instance;
-                } catch (e) {
-                    throw new AutoWiringError(key.name, (e as Error).message);
-                }
-            }
-            throw new KeyIsNotDefinedError(key.name);
-        } else {
-            const cacheKey = key;
-            if (this.values.has(cacheKey)) {
-                const cachedValue = this.values.get(cacheKey);
-                const isProtected = this.protected.has(cachedValue);
-                if (this.factories.has(cachedValue)) {
-                    if (isProtected) {
-                        return cachedValue as unknown as T;
-                    }
-                    return cachedValue(this) as T;
-                }
-                if (typeof cachedValue === 'function') {
-                    if (isProtected) {
-                        return cachedValue as unknown as T;
-                    }
-                    const result = cachedValue(this);
-                    this.values.set(cacheKey, result);
-                    if (!this._raw.has(cacheKey)) {
-                        this._raw.set(cacheKey, cachedValue as ValueOrFactoryOrCallable<any>);
-                    }
-                    this.frozen.set(cacheKey, true);
-                    return result as T;
-                }
-                return cachedValue as T;
-            }
-            throw new KeyIsNotDefinedError(cacheKey);
+            return cachedValue as T;
         }
+
+        throw new KeyIsNotDefinedError(cacheKey);
+    }
+
+    /**
+     * Checks if a key exists in the container.
+     * @param key - The key to check
+     * @returns True if the key exists, false otherwise
+     * @deprecated Since 3.0.0. Use has() instead.
+     */
+    offsetExists(key: string): boolean {
+        return this.has(key);
     }
 
     /**
@@ -222,15 +237,24 @@ export class Container {
      * @param key - The key to check
      * @returns True if the key exists, false otherwise
      */
-    offsetExists(key: string): boolean {
+    has(key: string): boolean {
         return this._keys.includes(key) || this.values.has(key) || this.classInstanceCache.has(key as any);
     }
 
     /**
      * Removes a key and its associated value from the container.
      * @param key - The key to remove
+     * @deprecated Since 3.0.0. Use unset() instead.
      */
     offsetUnset(key: string): void {
+        this.unset(key);
+    }
+
+    /**
+     * Removes a key and its associated value from the container.
+     * @param key - The key to remove
+     */
+    unset(key: string): void {
         if (this._keys.includes(key)) {
             const value = this.values.get(key);
             if (typeof value === 'object' || typeof value === 'function') {
@@ -305,8 +329,29 @@ export class Container {
     register(provider: IServiceProvider, values: Record<string, ValueOrFactoryOrCallable<any>> = {}): Container {
         provider.register(this as any);
         Object.entries(values).forEach(([key, value]) => {
-            this.offsetSet(key, value);
+            this.set(key, value);
         });
         return this;
+    }
+
+    /**
+     * Clears all registered services and resets the container to its initial state.
+     */
+    clear(): void {
+        this.values.clear();
+        this.classInstanceCache.clear();
+        this.factories.clear();
+        this.protected.clear();
+        this.frozen.clear();
+        this._raw.clear();
+        this._keys.length = 0;
+        this.dependencyMap.clear();
+    }
+
+    /**
+     * Disposes of the container and cleans up resources.
+     */
+    dispose(): void {
+        this.clear();
     }
 }

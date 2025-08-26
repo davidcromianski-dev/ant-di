@@ -7,17 +7,35 @@ describe('📦 Container - Factory Operations', () => {
         const factory = (c: Container) => 'value';
 
         container.factory(factory);
-        container.offsetSet('factory', factory);
-        assert.equal(container.offsetGet('factory'), 'value');
+        container.set('factory', factory);
+        assert.equal(container.get('factory'), 'value');
+    });
+
+    it('should register and get a factory using set method', () => {
+        const container = new Container();
+        const factory = (c: Container) => 'value';
+
+        container.factory(factory);
+        container.set('factory', factory);
+        assert.equal(container.get('factory'), 'value');
     });
 
     it('should register and get a factory directly using offsetSet with factory=true', () => {
         const container = new Container();
         const factory = (c: Container) => 'value';
 
-        // New way: register factory directly with offsetSet
+        // Legacy way: register factory directly with offsetSet
         container.offsetSet('factory', factory, true);
-        assert.equal(container.offsetGet('factory'), 'value');
+        assert.equal(container.get('factory'), 'value');
+    });
+
+    it('should register and get a factory directly using set with factory=true', () => {
+        const container = new Container();
+        const factory = (c: Container) => 'value';
+
+        // Recommended way: register factory directly with set
+        container.set('factory', factory, true);
+        assert.equal(container.get('factory'), 'value');
     });
 
     it('should register and get a factory using both methods (they should be equivalent)', () => {
@@ -31,26 +49,31 @@ describe('📦 Container - Factory Operations', () => {
         // Method 2: using offsetSet with factory=true
         container.offsetSet('factory2', factory, true);
 
-        // Both should work the same way
-        assert.equal(container.offsetGet('factory1'), 'value');
-        assert.equal(container.offsetGet('factory2'), 'value');
+        // Method 3: using new set method
+        container.set('factory3', factory, true);
+
+        // All should work the same way
+        assert.equal(container.get('factory1'), 'value');
+        assert.equal(container.get('factory2'), 'value');
+        assert.equal(container.get('factory3'), 'value');
         
-        // Both should be marked as factories
+        // All should be marked as factories
         assert.equal(container.raw('factory1'), factory);
         assert.equal(container.raw('factory2'), factory);
+        assert.equal(container.raw('factory3'), factory);
     });
 
     it('should protect a value', () => {
         const container = new Container();
         const protectedValue = (c: Container) => 'value';
         container.protect(protectedValue);
-        container.offsetSet('key', protectedValue);
-        assert.equal(container.offsetGet('key'), protectedValue);
+        container.set('key', protectedValue);
+        assert.equal(container.get('key'), protectedValue);
     });
 
     it('should get raw value', () => {
         const container = new Container();
-        container.offsetSet('key', 'value');
+        container.set('key', 'value');
         assert.equal(container.raw('key'), 'value');
     });
 
@@ -65,15 +88,15 @@ describe('📦 Container - Factory Operations', () => {
         const regularValue = 'regularValue';
 
         // Register as regular value (factory=false, default)
-        container.offsetSet('regular', regularValue, false);
-        assert.equal(container.offsetGet('regular'), 'regularValue');
+        container.set('regular', regularValue, false);
+        assert.equal(container.get('regular'), 'regularValue');
 
         // Register as factory (factory=true)
-        container.offsetSet('factory', factory, true);
-        assert.equal(container.offsetGet('factory'), 'factoryValue');
+        container.set('factory', factory, true);
+        assert.equal(container.get('factory'), 'factoryValue');
 
         // Register as regular value (factory=false, explicit)
-        container.offsetSet('explicitRegular', regularValue, false);
-        assert.equal(container.offsetGet('explicitRegular'), 'regularValue');
+        container.set('explicitRegular', regularValue, false);
+        assert.equal(container.get('explicitRegular'), 'regularValue');
     });
 });

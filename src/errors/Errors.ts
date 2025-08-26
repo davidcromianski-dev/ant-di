@@ -29,14 +29,8 @@ export class DependencyError extends Error {
 }
 
 export class FailedToResolveDependencyError extends Error {
-    constructor(paramTypeName: string, constructorName: string, errorMsg: string) {
-        super(`Failed to resolve dependency ${paramTypeName} for ${constructorName}: ${errorMsg}`);
-    }
-}
-
-export class AutoWiringError extends Error {
-    constructor(constructorName: string, errorMsg: string) {
-        super(`Auto-wiring failed for ${constructorName}: ${errorMsg}`);
+    constructor(paramTypeName: string, constructorName: string) {
+        super(`Failed to resolve dependency ${paramTypeName} for ${constructorName}`);
     }
 }
 
