@@ -6,7 +6,8 @@ export default defineConfig({
         lib: {
             entry: 'src/index.ts',
             name: 'ant-di',
-            fileName: (format) => `index.${format}.js`
+            formats: ['es', 'cjs'],
+            fileName: (format) => `index.${format === 'es' ? 'es' : 'cjs'}.js`
         },
     },
     plugins: [

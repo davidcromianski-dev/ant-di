@@ -46,6 +46,29 @@ The following dependencies are used for development, testing, and building:
 - **[vite](https://github.com/vitejs/vite)** - Build tool and dev server
 - **[vite-plugin-dts](https://github.com/qmhc/vite-plugin-dts)** - TypeScript declaration file generation for Vite
 
+## Jest Compatibility
+
+This package is fully compatible with Jest and other CommonJS-based testing frameworks. The build process generates both ESM and CommonJS outputs:
+
+- **ESM**: `dist/index.es.js` - For modern bundlers and ES modules
+- **CommonJS**: `dist/index.cjs.js` - For Jest, Node.js, and CommonJS environments
+
+### Using with Jest
+
+To use this package with Jest, simply import from the CommonJS build:
+
+```typescript
+// Jest test file
+const { Container } = require('@davidcromianski-dev/ant-di');
+
+describe('Container Tests', () => {
+    it('should create a container instance', () => {
+        const container = new Container();
+        expect(container).toBeInstanceOf(Container);
+    });
+});
+```
+
 ## Quick Start
 
 ```typescript
@@ -401,12 +424,6 @@ Explains factory functions, protected callables, and frozen key behavior.
 npx ts-node examples/service-providers.ts
 ```
 Demonstrates modular service registration using service providers.
-
-### Internationalization
-```bash
-npx ts-node examples/internationalization.ts
-```
-Shows multi-language support and error message localization.
 
 ### Advanced Patterns
 ```bash
