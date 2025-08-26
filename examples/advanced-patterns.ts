@@ -81,15 +81,15 @@ function advancedPatternsExamples() {
             environment: 'development'
         };
         return new ApplicationContext(
-            c.offsetGet(EventEmitter),
+            c.get(EventEmitter),
             config,
             logger,
         )}
     , true);
 
     // 2. Event-driven architecture
-    const eventEmitter = container.offsetGet(EventEmitter);
-    const appContext = container.offsetGet(ApplicationContext);
+    const eventEmitter = container.get(EventEmitter);
+    const appContext = container.get(ApplicationContext);
 
     // Subscribe to events
     eventEmitter.on('app:started', (data: any) => {

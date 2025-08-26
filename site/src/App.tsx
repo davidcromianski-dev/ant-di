@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Zap, 
-  Globe, 
-  Code, 
-  Package, 
-  Github, 
+import {
+  Zap,
+  Globe,
+  Code,
+  Package,
+  Github,
   BookOpen,
   CheckCircle,
   XCircle,
@@ -166,15 +166,15 @@ function App() {
             </div>
             <div className="flex items-center space-x-4">
               {/* Botão de tema */}
-              <button 
+              <button
                 onClick={toggleTheme}
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
                 title={theme === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro'}
               >
                 {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
-              
-              <a 
+
+              <a
                 href="https://github.com/davidcromianski-dev/ant-di"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -201,30 +201,30 @@ function App() {
             <Package className="h-3 w-3 mr-1" />
             Simple JavaScript Dependency Injection
           </div>
-          
+
           {/* Ícone de formiga carregando injeção */}
           <div className="flex justify-center mb-8">
             <div className="relative">
-              <AntIcon 
-                className="text-primary drop-shadow-lg" 
+              <AntIcon
+                className="text-primary drop-shadow-lg"
                 size={120}
               />
               {/* Efeito de brilho */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse rounded-full"></div>
             </div>
           </div>
-          
+
           <h1 className="text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Ant DI
           </h1>
-          
+
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Container de injeção de dependência simples e leve para JavaScript e TypeScript. 
+            Container de injeção de dependência simples e leve para JavaScript e TypeScript.
             Inspirado no PHP Pimple com recursos avançados como auto-wiring, service providers e internacionalização.
           </p>
-          
+
           <div className="flex items-center justify-center space-x-4">
-            <a 
+            <a
               href="https://github.com/davidcromianski-dev/ant-di"
               target="_blank"
               rel="noopener noreferrer"
@@ -233,7 +233,7 @@ function App() {
               <BookOpen className="h-4 w-4 mr-2" />
               Documentação
             </a>
-            <a 
+            <a
               href="#quick-start"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
             >
@@ -241,6 +241,33 @@ function App() {
               Quick Start
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold mb-4">Características Principais</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            O Ant DI oferece uma solução completa para injeção de dependência
+            com foco em simplicidade e performance.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <div key={index} className="rounded-lg border bg-card text-card-foreground shadow-sm text-center">
+              <div className="flex flex-col space-y-1.5 p-6">
+                <div className="mx-auto mb-4 h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                  {feature.icon}
+                </div>
+                <h3 className="text-2xl font-semibold leading-none tracking-tight text-lg">{feature.title}</h3>
+              </div>
+              <div className="p-6 pt-0">
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -252,7 +279,7 @@ function App() {
             Comece a usar o Ant DI em poucos passos. Exemplo básico de configuração e uso.
           </p>
         </div>
-        
+
         <div className="max-w-4xl mx-auto">
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div className="flex flex-col space-y-1.5 p-6 border-b">
@@ -264,7 +291,7 @@ function App() {
             <div className="p-6">
               <pre className="bg-muted rounded-lg p-4 overflow-x-auto text-sm">
                 <code className="text-foreground">
-{`import { Container } from '@davidcromianski-dev/ant-di';
+                  {`import { Container } from '@davidcromianski-dev/ant-di';
 
 // Create container
 const container = new Container();
@@ -307,33 +334,6 @@ container.register(new DatabaseServiceProvider());`}
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4">Características Principais</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            O Ant DI oferece uma solução completa para injeção de dependência 
-            com foco em simplicidade e performance.
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div key={index} className="rounded-lg border bg-card text-card-foreground shadow-sm text-center">
-              <div className="flex flex-col space-y-1.5 p-6">
-                <div className="mx-auto mb-4 h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                  {feature.icon}
-                </div>
-                <h3 className="text-2xl font-semibold leading-none tracking-tight text-lg">{feature.title}</h3>
-              </div>
-              <div className="p-6 pt-0">
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Comparison Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
@@ -342,7 +342,7 @@ container.register(new DatabaseServiceProvider());`}
             Veja como o Ant DI se compara com outras bibliotecas populares de injeção de dependência.
           </p>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-border rounded-lg">
             <thead>
@@ -389,11 +389,11 @@ container.register(new DatabaseServiceProvider());`}
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-4">Por que escolher o Ant DI?</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Comparado com outras bibliotecas de injeção de dependência, 
+            Comparado com outras bibliotecas de injeção de dependência,
             o Ant DI oferece vantagens únicas para projetos modernos.
           </p>
         </div>
-        
+
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Benefits */}
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
@@ -448,7 +448,7 @@ container.register(new DatabaseServiceProvider());`}
           </div>
           <div className="p-6 pt-0">
             <div className="flex items-center justify-center">
-              <a 
+              <a
                 href="https://github.com/davidcromianski-dev/ant-di"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -482,7 +482,7 @@ container.register(new DatabaseServiceProvider());`}
             <div className="flex flex-col items-end space-y-2">
               <p className="text-sm text-muted-foreground">
                 © {new Date().getFullYear()} Ant DI. Desenvolvido com ❤️ por{' '}
-                <a 
+                <a
                   href="https://github.com/davidcromianski-dev"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -492,8 +492,8 @@ container.register(new DatabaseServiceProvider());`}
                 </a>
               </p>
               <p className="text-xs text-muted-foreground">
-                <a 
-                  href="https://www.flaticon.com/free-icons/ant" 
+                <a
+                  href="https://www.flaticon.com/free-icons/ant"
                   title="ant icons"
                   className="hover:text-primary transition-colors"
                   target="_blank"

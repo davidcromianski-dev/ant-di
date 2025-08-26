@@ -27,32 +27,31 @@ function factoriesAndProtectionExamples() {
 
     // 1. Factory functions (new instance each time) - Traditional method
     const emailServiceFactory = (c: Container) => {
-        const config = c.offsetGet('smtpConfig');
+        const config = c.get('smtpConfig');
         return new EmailService(config);
     };
 
     container.factory(emailServiceFactory);
-    container.offsetSet('emailService', emailServiceFactory);
+    container.set('emailService', emailServiceFactory);
 
-    // 1b. Factory functions - New direct method using offsetSet with factory=true
+    // 1b. Factory functions - New direct method using set with factory=true
     const emailServiceFactory2 = (c: Container) => {
-        const config = c.offsetGet('smtpConfig');
+        const config = c.get('smtpConfig');
         return new EmailService(config);
     };
 
-    // New way: register factory directly with offsetSet
-    container.offsetSet('emailService2', emailServiceFactory2, true);
+    container.set('emailService2', emailServiceFactory2, true);
 
     // Register SMTP config
-    container.offsetSet('smtpConfig', { host: 'smtp.gmail.com', port: 587 });
+    container.set('smtpConfig', { host: 'smtp.gmail.com', port: 587 });
 
     console.log('Factory functions:');
-    const email1 = container.offsetGet('emailService');
-    const email2 = container.offsetGet('emailService');
+    const email1 = container.get('emailService');
+    const email2 = container.get('emailService');
     console.log('Different instances (traditional method):', email1 !== email2);
 
-    const email3 = container.offsetGet('emailService2');
-    const email4 = container.offsetGet('emailService2');
+    const email3 = container.get('emailService2');
+    const email4 = container.get('emailService2');
     console.log('Different instances (direct method):', email3 !== email4);
 
     // 2. Protected callables (return function itself)
@@ -61,29 +60,29 @@ function factoriesAndProtectionExamples() {
     };
 
     container.protect(protectedFactory);
-    container.offsetSet('protectedEmailService', protectedFactory);
+    container.set('protectedEmailService', protectedFactory);
 
     console.log('\nProtected callables:');
-    const protectedResult = container.offsetGet('protectedEmailService');
+    const protectedResult = container.get('protectedEmailService');
     console.log('Protected result type:', typeof protectedResult);
     console.log('Is function:', typeof protectedResult === 'function');
 
     // 3. Implicit factories (frozen after first use)
     const implicitFactory = (c: Container) => {
-        return new NotificationService(c.offsetGet('emailService'));
+        return new NotificationService(c.get('emailService'));
     };
 
-    container.offsetSet('notificationService', implicitFactory);
+    container.set('notificationService', implicitFactory);
 
     console.log('\nImplicit factories:');
-    const notification1 = container.offsetGet('notificationService');
-    const notification2 = container.offsetGet('notificationService');
+    const notification1 = container.get('notificationService');
+    const notification2 = container.get('notificationService');
     console.log('Same instance (frozen):', notification1 === notification2);
 
     // 4. Frozen key behavior
     console.log('\nFrozen key behavior:');
     try {
-        container.offsetSet('notificationService', 'new value');
+        container.set('notificationService', 'new value');
     } catch (error: any) {
         console.log('Cannot modify frozen key:', error.message);
     }
@@ -97,25 +96,25 @@ function factoriesAndProtectionExamples() {
     // 6. Demonstrating both factory registration methods
     console.log('\nFactory registration methods comparison:');
     
-    // Method 1: Traditional factory() + offsetSet
+    // Method 1: Traditional factory() + set
     const traditionalFactory = (c: Container) => 'traditional';
     container.factory(traditionalFactory);
-    container.offsetSet('traditional', traditionalFactory);
+    container.set('traditional', traditionalFactory);
     
-    // Method 2: Direct offsetSet with factory=true
+    // Method 2: Direct set with factory=true
     const directFactory = (c: Container) => 'direct';
-    container.offsetSet('direct', directFactory, true);
+    container.set('direct', directFactory, true);
     
     // Both should work identically
-    console.log('Traditional method result:', container.offsetGet('traditional'));
-    console.log('Direct method result:', container.offsetGet('direct'));
-    console.log('Both methods equivalent:', container.offsetGet('traditional') === container.offsetGet('direct'));
+    console.log('Traditional method result:', container.get('traditional'));
+    console.log('Direct method result:', container.get('direct'));
+    console.log('Both methods equivalent:', container.get('traditional') === container.get('direct'));
     
     // 7. Explicit factory=false behavior
     console.log('\nExplicit factory=false behavior:');
     const regularValue = 'regularValue';
-    container.offsetSet('explicitRegular', regularValue, false);
-    console.log('Explicit regular value:', container.offsetGet('explicitRegular'));
+    container.set('explicitRegular', regularValue, false);
+    console.log('Explicit regular value:', container.get('explicitRegular'));
     console.log('Raw value is not a function:', typeof container.raw('explicitRegular') !== 'function');
 } 
 
