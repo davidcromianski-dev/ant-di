@@ -280,7 +280,7 @@ container.register(new DatabaseServiceProvider());`;
 
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Container de injeção de dependência simples e leve para JavaScript e TypeScript.
-            Inspirado no PHP Pimple com recursos avançados como auto-wiring, service providers e internacionalização.
+            Inspirado no PHP Pimple com recursos avançados como auto-wiring e service providers.
           </p>
 
           <div className="flex items-center justify-center space-x-4">
