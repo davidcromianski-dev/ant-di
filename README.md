@@ -27,9 +27,6 @@ npm install @davidcromianski-dev/ant-di
 pnpm add @davidcromianski-dev/ant-di
 ```
 
-> [!IMPORTANT]
-> This package is not yet published to npm, so you need to install it from the GitHub repository. Use the `.npmrc.example` file to create a `.npmrc` file in your project root.
-
 ## Dependencies
 
 ### Runtime Dependencies

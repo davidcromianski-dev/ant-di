@@ -1,9 +1,28 @@
 {
   "name": "@davidcromianski-dev/ant-di",
-  "version": "3.0.0",
+  "version": "1.0.1",
+  "description": "Simple JavaScript Dependency Injection Container inspired by PHP Pimple with advanced features like auto-wiring and service providers",
+  "keywords": [
+    "dependency-injection",
+    "di",
+    "container",
+    "typescript",
+    "javascript",
+    "auto-wiring",
+    "service-provider",
+    "singleton",
+    "factory",
+    "pimple"
+  ],
   "author": {
     "name": "David Cromianski",
-    "email": "davidcromianski.dev@gmail.com"
+    "email": "davidcromianski.dev@gmail.com",
+    "url": "https://github.com/davidcromianski-dev"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/davidcromianski-dev/ant-di#readme",
+  "bugs": {
+    "url": "https://github.com/davidcromianski-dev/ant-di/issues"
   },
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
@@ -17,6 +36,8 @@
   },
   "files": [
     "dist",
+    "README.md",
+    "LICENSE",
     "!dist/**/*.test.d.ts"
   ],
   "repository": {
@@ -24,16 +45,16 @@
     "url": "https://github.com/davidcromianski-dev/ant-di.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/",
-    "build": "vite build",
-    "prepublishOnly": "pnpm build",
     "access": "public"
   },
   "scripts": {
     "build": "vite build",
     "prepublishOnly": "pnpm build",
     "test": "poku",
-    "examples": "npx ts-node examples/examples.ts"
+    "examples": "npx ts-node examples/examples.ts",
+    "prepublish": "pnpm build && pnpm test",
+    "publish:npm": "npm publish",
+    "publish:dry-run": "npm publish --dry-run"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
