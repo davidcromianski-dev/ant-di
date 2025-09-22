@@ -297,14 +297,14 @@ container.register(new DatabaseServiceProvider());`;
             Inspirado no PHP Pimple com recursos avançados como auto-wiring e service providers.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center space-x-4">
+          <div className="flex gap-4 flex-wrap items-center justify-center space-x-4">
             <a
               href="https://www.npmjs.com/package/@davidcromianski-dev/ant-di"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-red-600 text-white hover:bg-red-700 h-11 px-8"
             >
-              <Package className="h-4 w-4 mr-2" />
+              <Package className="h-4 w-4" />
               NPM
               {downloadCount !== null && (
                 <span className="ml-2 text-xs bg-red-700 px-2 py-1 rounded">
@@ -318,14 +318,14 @@ container.register(new DatabaseServiceProvider());`;
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
             >
-              <BookOpen className="h-4 w-4 mr-2" />
+              <BookOpen className="h-4 w-4" />
               Documentação
             </a>
             <a
               href="#quick-start"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
             >
-              <Code className="h-4 w-4 mr-2" />
+              <Code className="h-4 w-4" />
               Quick Start
             </a>
           </div>
