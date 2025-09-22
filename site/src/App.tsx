@@ -297,7 +297,7 @@ container.register(new DatabaseServiceProvider());`;
             Inspirado no PHP Pimple com recursos avançados como auto-wiring e service providers.
           </p>
 
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex flex-wrap items-center justify-center space-x-4">
             <a
               href="https://www.npmjs.com/package/@davidcromianski-dev/ant-di"
               target="_blank"
