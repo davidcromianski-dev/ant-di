@@ -14,7 +14,8 @@ import {
   AlertTriangle,
   Star,
   Copy,
-  Check
+  Check,
+  Download
 } from 'lucide-react';
 import AntIcon from './components/AntIcon';
 import { useTheme } from './contexts/ThemeContext';
@@ -27,9 +28,10 @@ import './code-highlight.css';
 function App() {
   const { theme, toggleTheme } = useTheme();
   const [starCount, setStarCount] = useState<number | null>(null);
+  const [downloadCount, setDownloadCount] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Buscar stars do GitHub
+  // Buscar stars do GitHub e downloads do NPM
   useEffect(() => {
     const fetchStars = async () => {
       try {
@@ -43,7 +45,20 @@ function App() {
       }
     };
 
+    const fetchDownloads = async () => {
+      try {
+        const response = await fetch('https://api.npmjs.org/downloads/point/last-month/@davidcromianski-dev/ant-di');
+        if (response.ok) {
+          const data = await response.json();
+          setDownloadCount(data.downloads);
+        }
+      } catch (error) {
+        console.log('Erro ao buscar downloads:', error);
+      }
+    };
+
     fetchStars();
+    fetchDownloads();
   }, []);
 
   // Highlight code blocks when component mounts
@@ -284,6 +299,20 @@ container.register(new DatabaseServiceProvider());`;
           </p>
 
           <div className="flex items-center justify-center space-x-4">
+            <a
+              href="https://www.npmjs.com/package/@davidcromianski-dev/ant-di"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-red-600 text-white hover:bg-red-700 h-11 px-8"
+            >
+              <Package className="h-4 w-4 mr-2" />
+              NPM
+              {downloadCount !== null && (
+                <span className="ml-2 text-xs bg-red-700 px-2 py-1 rounded">
+                  {downloadCount.toLocaleString()} downloads
+                </span>
+              )}
+            </a>
             <a
               href="https://github.com/davidcromianski-dev/ant-di"
               target="_blank"
@@ -532,7 +561,23 @@ container.register(new DatabaseServiceProvider());`}
             </p>
           </div>
           <div className="p-6 pt-0">
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center space-x-4">
+              <a
+                href="https://www.npmjs.com/package/@davidcromianski-dev/ant-di"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-red-600 text-white hover:bg-red-700 h-11 px-8"
+              >
+                <Package className="h-4 w-4 mr-2" />
+                Instalar via NPM
+                {downloadCount !== null && (
+                  <>
+                    <Download className="h-4 w-4 ml-2 mr-1" />
+                    <span className="text-sm">{downloadCount.toLocaleString()}</span>
+                  </>
+                )}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </a>
               <a
                 href="https://github.com/davidcromianski-dev/ant-di"
                 target="_blank"
