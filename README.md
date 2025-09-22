@@ -1,5 +1,11 @@
 # Ant DI
 
+[![npm version](https://img.shields.io/npm/v/@davidcromianski-dev/ant-di.svg?style=flat-square)](https://www.npmjs.com/package/@davidcromianski-dev/ant-di)
+[![npm downloads](https://img.shields.io/npm/dm/@davidcromianski-dev/ant-di.svg?style=flat-square)](https://www.npmjs.com/package/@davidcromianski-dev/ant-di)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@davidcromianski-dev/ant-di?style=flat-square)](https://www.npmjs.com/package/@davidcromianski-dev/ant-di)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?style=flat-square&logo=typescript)](https://www.npmjs.com/package/@davidcromianski-dev/ant-di)
+
 ## Simple JavaScript Dependency Injection Package
 
 This package is a simple dependency injection container for JavaScript and TypeScript. It is inspired by the PHP Pimple package and provides advanced features like wiring and service providers.

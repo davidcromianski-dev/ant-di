@@ -1,6 +1,6 @@
 {
   "name": "@davidcromianski-dev/ant-di",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple JavaScript Dependency Injection Container inspired by PHP Pimple with advanced features like auto-wiring and service providers",
   "keywords": [
     "dependency-injection",
