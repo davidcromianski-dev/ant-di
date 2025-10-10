@@ -1,3 +1,5 @@
+import { DependencyKey } from '../types';
+
 export class ExpectInvokableError extends Error {
     constructor() {
         super('Callable is not a Closure or invokable object.');
@@ -5,13 +7,13 @@ export class ExpectInvokableError extends Error {
 }
 
 export class KeyFrozenError extends Error {
-    constructor(key: string) {
+    constructor(key: DependencyKey) {
         super(`Key "${key}" is frozen and cannot be modified.`);
     }
 }
 
 export class KeyIsNotDefinedError extends Error {
-    constructor(key: string) {
+    constructor(key: DependencyKey) {
         super(`Key "${key}" is not defined.`);
     }
 }

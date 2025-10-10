@@ -9,3 +9,5 @@ export type Callable = ((...args: any[]) => any);
 export type ValueOrFactoryOrCallable<T> = T | Factory<T> | Callable;
 
 export type Constructor<T> = { new(...args: any[]): T };
+
+export type DependencyKey = string | Constructor<any> | Symbol;
