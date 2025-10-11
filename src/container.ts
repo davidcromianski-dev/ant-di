@@ -1,6 +1,6 @@
 import {
     CircularDependencyError,
-    ExpectInvokableError,
+    ExpectInvocableError,
     FailedToResolveDependencyError,
     FailedToResolveDueToUndefinedParamError,
     KeyFrozenError,
@@ -78,23 +78,6 @@ export class Container {
         });
     }
 
-    private _checkCircularDependency(
-        target: Constructor<any>,
-        dependencies: Constructor<any>[]
-    ): void {
-        if (dependencies.includes(target)) {
-            throw new CircularDependencyError(target.name, target.name);
-        }
-        for (const dependency of dependencies) {
-            if (
-                this.dependencyMap.has(dependency) &&
-                this.dependencyMap.get(dependency)?.includes(target)
-            ) {
-                throw new CircularDependencyError(target.name, dependency.name);
-            }
-        }
-    }
-
     /**
      * Automatically wires dependencies for a constructor function.
      * @param constructor - The constructor function to auto-wire
@@ -135,21 +118,35 @@ export class Container {
         return new constructor(...resolvedParams);
     }
 
+    private _resolveKey(key: DependencyKey): Constructor<any> {
+        if (typeof key === "symbol" || typeof key === "string") {
+            return this.get(key);
+        }
+        if (typeof key === "function") {
+            return key;
+        }
+        throw new ExpectInvocableError();
+    }
+
     /**
      * Binds dependencies for a constructor function or class name.
      * @param target - The constructor function to bind dependencies for
      * @param dependencies - Array of dependency types/constructors
      */
-    bind<T>(target: Constructor<T>, dependencies: Constructor<any>[]): void {
+    bind<T>(target: DependencyKey, dependencies: DependencyKey[]): void {
+        const resolvedTarget = this._resolveKey(target);
+
         if (typeof target !== "function") {
-            throw new ExpectInvokableError();
+            throw new ExpectInvocableError();
         }
 
+        const resolvedDependencies = dependencies.map((dep) => this._resolveKey(dep)) as Constructor<any>[];
+
         if (
-            dependencies.length > 0 &&
-            dependencies.some((dep) => typeof dep !== "function")
+            resolvedDependencies.length > 0 &&
+            resolvedDependencies.some((dep) => typeof dep !== "function")
         ) {
-            throw new ExpectInvokableError();
+            throw new ExpectInvocableError();
         }
 
         const key = target.name;
@@ -157,10 +154,19 @@ export class Container {
             throw new KeyFrozenError(key);
         }
 
-        this._checkCircularDependency(target, dependencies);
+        const dependencyNames = resolvedDependencies.map((dep) => dep.name);
+        if (dependencyNames.includes(resolvedTarget.name)) {
+            throw new CircularDependencyError(resolvedTarget.name, resolvedTarget.name);
+        }
+        for (const dependency of resolvedDependencies) {
+            const dependencyDeps = this.dependencyMap.get(dependency);
+            if (dependencyDeps?.includes(resolvedTarget)) {
+                throw new CircularDependencyError(resolvedTarget.name, dependency.name);
+            }
+        }
 
-        this.dependencyMap.set(target, dependencies);
-        this.values.set(key, () => this._autoWire(target));
+        this.dependencyMap.set(resolvedTarget, resolvedDependencies);
+        this.values.set(key, () => this._autoWire(resolvedTarget));
 
         if (!this._keys.includes(key)) {
             this._keys.push(key);
@@ -320,7 +326,7 @@ export class Container {
      */
     factory<T>(factory: Factory<T>): Factory<T> {
         if (typeof factory !== "function") {
-            throw new ExpectInvokableError();
+            throw new ExpectInvocableError();
         }
         this.factories.set(factory, true);
         return factory;
@@ -334,7 +340,7 @@ export class Container {
      */
     protect(callable: Callable): Callable {
         if (typeof callable !== "function") {
-            throw new ExpectInvokableError();
+            throw new ExpectInvocableError();
         }
         this.protected.set(callable, true);
         return callable;

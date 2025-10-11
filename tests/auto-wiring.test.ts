@@ -28,7 +28,7 @@ describe('📦 Container - Auto-wiring', () => {
         const container = new Container();
         container.bind(NoDepsClass, []);
         container.bind(SingleDepClass, [NoDepsClass]);
-        const instance = container.get(SingleDepClass);
+        const instance = container.get(SingleDepClass) as SingleDepClass;
         assert.equal(instance instanceof SingleDepClass, true);
         assert.equal(instance.noDeps instanceof NoDepsClass, true);
     });
@@ -38,7 +38,7 @@ describe('📦 Container - Auto-wiring', () => {
         container.bind(NoDepsClass, []);
         container.bind(SingleDepClass, [NoDepsClass]);
         container.bind(MultiDepClass, [NoDepsClass, SingleDepClass]);
-        const instance = container.get(MultiDepClass);
+        const instance = container.get(MultiDepClass) as MultiDepClass;
         assert.equal(instance instanceof MultiDepClass, true);
         assert.equal(instance.noDeps instanceof NoDepsClass, true);
         assert.equal(instance.singleDep instanceof SingleDepClass, true);
@@ -81,8 +81,8 @@ describe('📦 Container - Auto-wiring', () => {
         
         // Should throw error when trying to bind with non-function dependency
         assert.throws(() => {
-            container.bind(UnresolvableClass, [Symbol('NonExistent') as any]);
-        }, /Callable is not a Closure or invokable object/i);
+            container.bind(UnresolvableClass, [123 as any]);
+        }, /Callable is not a Closure or invokable object\./i);
     });
 
     it('should handle binding with valid dependencies', () => {
