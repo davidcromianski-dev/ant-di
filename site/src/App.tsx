@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
 import {
-  Zap,
-  Code,
-  Package,
-  Github,
-  BookOpen,
-  CheckCircle,
-  XCircle,
-  ArrowRight,
-  Sun,
-  Moon,
   AlertTriangle,
-  Star,
-  Copy,
+  ArrowRight,
+  BookOpen,
   Check,
+  CheckCircle,
+  Code,
+  Copy,
   Download,
+  Github,
+  Moon,
+  Package,
+  Star,
+  Sun,
+  XCircle,
+  Zap,
 } from 'lucide-react';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/themes/prism-tomorrow.css';
+import { useEffect, useState } from 'react';
+import './code-highlight.css';
 import AntIcon from './components/AntIcon';
 import { useTheme } from './contexts/ThemeContext';
-import Prism from 'prismjs';
-import 'prismjs/themes/prism-tomorrow.css';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-javascript';
-import './code-highlight.css';
 
 function App() {
   const { theme, toggleTheme } = useTheme();
@@ -73,37 +73,49 @@ function App() {
 // Create container
 const container = new Container();
 
-// Register a service
-container.set('database', () => new DatabaseConnection());
+// 1. Basic value storage
+container.set('appName', 'My Application');
+container.set('version', '1.0.0');
 
-// Get the service
-const db = container.get('database');
+// 2. Symbol keys
+const DB_CONFIG = Symbol('dbConfig');
+const API_KEY = Symbol('apiKey');
+container.set(DB_CONFIG, { host: 'localhost', port: 5432 });
+container.set(API_KEY, 'secret-api-key');
 
-// Auto-wiring example
-class UserService {
-    constructor(private db: DatabaseConnection) {}
-}
+// 3. Class keys
+class DatabaseConnection {
+    constructor(private config: any) {}
 
-container.bind(UserService, [DatabaseConnection]);
-const userService = container.get(UserService);
-
-// Service provider example
-class DatabaseServiceProvider implements IServiceProvider {
-    register(container: Container) {
-        container.set('db.host', 'localhost');
-        container.set('db.port', 5432);
-        
-        const connectionFactory = (c: Container) => ({
-            host: c.get('db.host'),
-            port: c.get('db.port'),
-            connect: () => \`Connected to \${c.get('db.host')}:\${c.get('db.port')}\`
-        });
-        
-        container.set('db.connection', connectionFactory, true);
+    connect() {
+        return \`Connected to \${this.config.host}:\${this.config.port}\`;
     }
 }
 
-container.register(new DatabaseServiceProvider());`;
+class UserService {
+    constructor(private db: DatabaseConnection) {}
+
+    getUser(id: number) {
+        return this.db.connect() + \` - Finding user \${id}\`;
+    }
+}
+
+// Register classes as keys
+container.set(DatabaseConnection, () => new DatabaseConnection(container.get(DB_CONFIG)));
+container.set(UserService, () => new UserService(container.get(DatabaseConnection)));
+
+// 4. Factory functions (new instance each time)
+const timestampFactory = (c: Container) => new Date().toISOString();
+container.set('timestamp', timestampFactory, true);
+
+// 5. Auto-wiring with manual binding
+container.bind(DatabaseConnection, []);
+container.bind(UserService, [DatabaseConnection]);
+
+// Get instances
+const userService = container.get(UserService);
+const dbConfig = container.get(DB_CONFIG);
+const apiKey = container.get(API_KEY);`;
 
     try {
       await navigator.clipboard.writeText(codeText);
@@ -123,12 +135,12 @@ container.register(new DatabaseServiceProvider());`;
     {
       icon: <Code className='h-6 w-6' />,
       title: 'Auto-wiring Manual',
-      description: 'Controle total sobre a resolução de dependências',
+      description: 'Controle total sobre a resolução de dependências com bind()',
     },
     {
       icon: <Package className='h-6 w-6' />,
-      title: 'Service Providers',
-      description: 'Organização modular de serviços com providers',
+      title: 'Factory Functions',
+      description: 'Criação de instâncias sob demanda com controle total',
     },
   ];
 
@@ -139,6 +151,7 @@ container.register(new DatabaseServiceProvider());`;
     'Testabilidade excelente',
     'Proxy access para conveniência',
     'Frozen keys para segurança',
+    'Factory functions com controle total',
   ];
 
   const limitations = [
@@ -157,7 +170,7 @@ container.register(new DatabaseServiceProvider());`;
       typeSafety: 'Manual',
       autoWiring: 'Manual',
       decorators: false,
-      serviceProviders: true,
+      factoryFunctions: true,
       circularDeps: false,
       lifecycleHooks: false,
       testability: 'Excelente',
@@ -170,7 +183,7 @@ container.register(new DatabaseServiceProvider());`;
       typeSafety: 'Excelente',
       autoWiring: 'Automático',
       decorators: true,
-      serviceProviders: false,
+      factoryFunctions: false,
       circularDeps: true,
       lifecycleHooks: true,
       testability: 'Boa',
@@ -183,7 +196,7 @@ container.register(new DatabaseServiceProvider());`;
       typeSafety: 'Excelente',
       autoWiring: 'Automático',
       decorators: true,
-      serviceProviders: false,
+      factoryFunctions: false,
       circularDeps: true,
       lifecycleHooks: false,
       testability: 'Boa',
@@ -196,7 +209,7 @@ container.register(new DatabaseServiceProvider());`;
       typeSafety: 'Limitado',
       autoWiring: 'Por nome',
       decorators: false,
-      serviceProviders: false,
+      factoryFunctions: true,
       circularDeps: false,
       lifecycleHooks: false,
       testability: 'Excelente',
@@ -209,7 +222,7 @@ container.register(new DatabaseServiceProvider());`;
       typeSafety: 'Excelente',
       autoWiring: 'Automático',
       decorators: true,
-      serviceProviders: false,
+      factoryFunctions: false,
       circularDeps: true,
       lifecycleHooks: true,
       testability: 'Boa',
@@ -293,7 +306,8 @@ container.register(new DatabaseServiceProvider());`;
 
           <p className='text-xl text-muted-foreground mb-8 max-w-2xl mx-auto'>
             Container de injeção de dependência simples e leve para JavaScript e TypeScript.
-            Inspirado no PHP Pimple com recursos avançados como auto-wiring e service providers.
+            Inspirado no PHP Pimple com recursos avançados como auto-wiring manual e factory
+            functions.
           </p>
 
           <div className='flex gap-4 flex-wrap items-center justify-center space-x-4'>
@@ -303,7 +317,7 @@ container.register(new DatabaseServiceProvider());`;
               rel='noopener noreferrer'
               className='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-red-600 text-white hover:bg-red-700 h-11 px-8'
             >
-              <Package className='h-4 w-4' />
+              <Package className='h-4 w-4 mr-2' />
               NPM
               {downloadCount !== null && (
                 <span className='ml-2 text-xs bg-red-700 px-2 py-1 rounded'>
@@ -317,14 +331,14 @@ container.register(new DatabaseServiceProvider());`;
               rel='noopener noreferrer'
               className='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8'
             >
-              <BookOpen className='h-4 w-4' />
+              <BookOpen className='h-4 w-4 mr-2' />
               Documentação
             </a>
             <a
               href='#quick-start'
               className='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8'
             >
-              <Code className='h-4 w-4' />
+              <Code className='h-4 w-4 mr-2' />
               Quick Start
             </a>
           </div>
@@ -381,7 +395,7 @@ container.register(new DatabaseServiceProvider());`;
                     Exemplo Básico
                   </h3>
                   <p className='text-sm text-muted-foreground'>
-                    Container de injeção de dependência com auto-wiring e service providers
+                    Container flexível com Symbol keys, class keys, factory functions e auto-wiring
                   </p>
                 </div>
                 <div className='flex items-center space-x-2'>
@@ -414,37 +428,49 @@ container.register(new DatabaseServiceProvider());`;
 // Create container
 const container = new Container();
 
-// Register a service
-container.set('database', () => new DatabaseConnection());
+// 1. Basic value storage
+container.set('appName', 'My Application');
+container.set('version', '1.0.0');
 
-// Get the service
-const db = container.get('database');
+// 2. Symbol keys
+const DB_CONFIG = Symbol('dbConfig');
+const API_KEY = Symbol('apiKey');
+container.set(DB_CONFIG, { host: 'localhost', port: 5432 });
+container.set(API_KEY, 'secret-api-key');
 
-// Auto-wiring example
-class UserService {
-    constructor(private db: DatabaseConnection) {}
-}
+// 3. Class keys
+class DatabaseConnection {
+    constructor(private config: any) {}
 
-container.bind(UserService, [DatabaseConnection]);
-const userService = container.get(UserService);
-
-// Service provider example
-class DatabaseServiceProvider implements IServiceProvider {
-    register(container: Container) {
-        container.set('db.host', 'localhost');
-        container.set('db.port', 5432);
-        
-        const connectionFactory = (c: Container) => ({
-            host: c.get('db.host'),
-            port: c.get('db.port'),
-            connect: () => \`Connected to \${c.get('db.host')}:\${c.get('db.port')}\`
-        });
-        
-        container.set('db.connection', connectionFactory, true);
+    connect() {
+        return \`Connected to \${this.config.host}:\${this.config.port}\`;
     }
 }
 
-container.register(new DatabaseServiceProvider());`}
+class UserService {
+    constructor(private db: DatabaseConnection) {}
+
+    getUser(id: number) {
+        return this.db.connect() + \` - Finding user \${id}\`;
+    }
+}
+
+// Register classes as keys
+container.set(DatabaseConnection, () => new DatabaseConnection(container.get(DB_CONFIG)));
+container.set(UserService, () => new UserService(container.get(DatabaseConnection)));
+
+// 4. Factory functions (new instance each time)
+const timestampFactory = (c: Container) => new Date().toISOString();
+container.set('timestamp', timestampFactory, true);
+
+// 5. Auto-wiring with manual binding
+container.bind(DatabaseConnection, []);
+container.bind(UserService, [DatabaseConnection]);
+
+// Get instances
+const userService = container.get(UserService);
+const dbConfig = container.get(DB_CONFIG);
+const apiKey = container.get(API_KEY);`}
                   </code>
                 </pre>
               </div>
@@ -477,7 +503,7 @@ container.register(new DatabaseServiceProvider());`}
                 <th className='border border-border p-3 text-center font-semibold'>Auto-wiring</th>
                 <th className='border border-border p-3 text-center font-semibold'>Decorators</th>
                 <th className='border border-border p-3 text-center font-semibold'>
-                  Service Providers
+                  Factory Functions
                 </th>
                 <th className='border border-border p-3 text-center font-semibold'>
                   Testabilidade
@@ -500,7 +526,7 @@ container.register(new DatabaseServiceProvider());`}
                     {lib.decorators ? '✅' : '❌'}
                   </td>
                   <td className='border border-border p-3 text-center'>
-                    {lib.serviceProviders ? '✅' : '❌'}
+                    {lib.factoryFunctions ? '✅' : '❌'}
                   </td>
                   <td className='border border-border p-3 text-center'>{lib.testability}</td>
                 </tr>
