@@ -26,3 +26,64 @@ dist-ssr
 /auth.json
 /coverage/
 COMPARISON.md
+
+# Quality and Security Tools
+coverage/
+docs/api/
+.eslintcache
+.prettiercache
+*.tsbuildinfo
+
+# Security
+.snyk
+snyk.json
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Lock files (keep pnpm-lock.yaml)
+package-lock.json
+yarn.lock
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Documentation
+docs/
+api-report.md

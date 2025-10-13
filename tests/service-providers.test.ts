@@ -1,16 +1,17 @@
-import { describe, it, assert } from 'poku';
-import { Container, IServiceProvider } from '../src';
+import { assert, describe, it } from 'poku';
+import { Container, ServiceProviderInterface } from '../src';
 
 describe('📦 Container - Service Providers', () => {
-    it('should register a service provider', () => {
-        const container = new Container();
-        const provider: IServiceProvider = {
-            register: (c: any) => {
-                c.set('service', 'value');
-            }
-        };
+  it('should register a service provider', () => {
+    const container = new Container();
+    const provider: ServiceProviderInterface = {
+      register: (c: any) => {
+        c.set('service', 'value');
+        return provider;
+      },
+    };
 
-        container.register(provider);
-        assert.equal(container.get('service'), 'value');
-    });
+    container.register(provider);
+    assert.equal(container.get('service'), 'value');
+  });
 });

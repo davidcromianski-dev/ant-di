@@ -1,10 +1,12 @@
 # Container Examples
 
-This directory contains comprehensive examples demonstrating various use cases of the Container dependency injection system.
+This directory contains comprehensive examples demonstrating various use cases
+of the Container dependency injection system.
 
 ## Examples Overview
 
 ### 1. Basic Usage (`basic-usage.ts`)
+
 - Simple value storage and retrieval
 - Factory functions
 - Protected callables
@@ -12,6 +14,7 @@ This directory contains comprehensive examples demonstrating various use cases o
 - Container management operations
 
 ### 2. Dependency Injection (`dependency-injection.ts`)
+
 - Manual dependency binding
 - Auto-wiring with constructor injection
 - Singleton behavior
@@ -19,6 +22,7 @@ This directory contains comprehensive examples demonstrating various use cases o
 - Dependency binding by name
 
 ### 3. Factories and Protection (`factories-and-protection.ts`)
+
 - Factory functions (new instance each time)
 - Protected callables (return function itself)
 - Implicit factories (frozen after first use)
@@ -26,17 +30,28 @@ This directory contains comprehensive examples demonstrating various use cases o
 - Raw value access
 
 ### 4. Service Providers (`service-providers.ts`)
+
 - Service provider pattern implementation
 - Modular service registration
 - Additional values with providers
 - Real-world service organization
 
-### . Advanced Patterns (`advanced-patterns.ts`)
+### 5. Advanced Patterns (`advanced-patterns.ts`)
+
 - Complex dependency graphs
 - Event-driven architecture
 - Proxy access patterns
 - Container composition
 - Service lifecycle management
+
+### 6. ValueObject Features (`valueobject-features.ts`)
+
+- Isolated dependency management
+- ValueObject creation and configuration
+- Dependency validation and resolution
+- Circular dependency detection
+- Singleton and factory patterns
+- ValueObject cloning and management
 
 ## Running Examples
 
@@ -56,6 +71,8 @@ npx ts-node examples/[example-name].ts
 4. **Flexibility**: Multiple ways to register and retrieve services
 5. **Safety**: Frozen keys, protected callables, error handling
 6. **Real-world Patterns**: Event systems, configuration management
+7. **ValueObject Management**: Isolated dependency handling and advanced
+   features
 
 ## Best Practices
 
@@ -64,3 +81,6 @@ npx ts-node examples/[example-name].ts
 - Use factories for services that need new instances each time
 - Protect callables when you want to return the function itself
 - Handle circular dependencies appropriately
+- Use ValueObjects for isolated dependency management
+- Validate dependencies before resolution
+- Leverage ValueObject cloning for configuration variations

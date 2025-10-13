@@ -1,0 +1,34 @@
+{
+  "reporter": ["text", "html", "lcov"],
+  "reports-dir": "coverage",
+  "temp-dir": "coverage/.nyc_output",
+  "check-coverage": true,
+  "lines": 80,
+  "functions": 80,
+  "branches": 80,
+  "statements": 80,
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/tests/**",
+    "**/examples/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/coverage/**",
+    "**/*.d.ts",
+    "**/vite.config.ts",
+    "**/poku.config.ts",
+    "**/eslint.config.js"
+  ],
+  "include": ["src/**/*.ts"],
+  "all": true,
+  "src": "src",
+  "instrument": true,
+  "clean": true,
+  "watermarks": {
+    "lines": [80, 95],
+    "functions": [80, 95],
+    "branches": [80, 95],
+    "statements": [80, 95]
+  }
+}

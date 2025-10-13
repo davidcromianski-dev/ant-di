@@ -8,19 +8,28 @@
 
 ## Simple JavaScript Dependency Injection Package
 
-This package is a simple dependency injection container for JavaScript and TypeScript. It is inspired by the PHP Pimple package and provides advanced features like wiring and service providers.
+This package is a simple dependency injection container for JavaScript and
+TypeScript. It is inspired by the PHP Pimple package and provides advanced
+features like wiring and service providers.
 
 ![ant-di](https://github.com/user-attachments/assets/ed38e310-6c24-4b7e-a90f-fc524c811393)
 
 ## Features
 
 - **Simple and lightweight** - Easy to use dependency injection container
-- **Auto-wiring** - Manual dependency resolution for TypeScript classes with automatic singleton caching
-- **Singleton behavior** - Automatic instance caching ensures classes return the same instance
+- **Auto-wiring** - Manual dependency resolution for TypeScript classes with
+  automatic singleton caching
+- **Singleton behavior** - Automatic instance caching ensures classes return the
+  same instance
 - **Factory support** - Create new instances on each request
 - **Protected callables** - Store functions without executing them
 - **Frozen keys** - Prevent modification after first resolution
 - **Service providers** - Modular service registration
+- **ValueObject management** - Isolated dependency management with advanced
+  features
+- **Circular dependency detection** - Built-in prevention of circular
+  dependencies
+- **Comprehensive error handling** - Detailed error classes for better debugging
 - **Comprehensive testing** - Full test coverage with Poku
 - **Rich examples** - Multiple usage patterns and real-world scenarios
 
@@ -36,24 +45,33 @@ pnpm add @davidcromianski-dev/ant-di
 ## Dependencies
 
 ### Runtime Dependencies
-This package has **zero runtime dependencies**, making it lightweight and avoiding dependency conflicts.
+
+This package has **zero runtime dependencies**, making it lightweight and
+avoiding dependency conflicts.
 
 ### Development Dependencies
+
 The following dependencies are used for development, testing, and building:
 
 - **[poku](https://github.com/antfu/poku)** - Fast test runner for Node.js
-- **[ts-node](https://github.com/TypeStrong/ts-node)** - TypeScript execution engine for Node.js
-- **[tsx](https://github.com/esbuild-kit/tsx)** - TypeScript execution engine with esbuild
-- **[typescript](https://github.com/microsoft/TypeScript)** - TypeScript compiler
+- **[ts-node](https://github.com/TypeStrong/ts-node)** - TypeScript execution
+  engine for Node.js
+- **[tsx](https://github.com/esbuild-kit/tsx)** - TypeScript execution engine
+  with esbuild
+- **[typescript](https://github.com/microsoft/TypeScript)** - TypeScript
+  compiler
 - **[vite](https://github.com/vitejs/vite)** - Build tool and dev server
-- **[vite-plugin-dts](https://github.com/qmhc/vite-plugin-dts)** - TypeScript declaration file generation for Vite
+- **[vite-plugin-dts](https://github.com/qmhc/vite-plugin-dts)** - TypeScript
+  declaration file generation for Vite
 
 ## Jest Compatibility
 
-This package is fully compatible with Jest and other CommonJS-based testing frameworks. The build process generates both ESM and CommonJS outputs:
+This package is fully compatible with Jest and other CommonJS-based testing
+frameworks. The build process generates both ESM and CommonJS outputs:
 
 - **ESM**: `dist/index.es.js` - For modern bundlers and ES modules
-- **CommonJS**: `dist/index.cjs.js` - For Jest, Node.js, and CommonJS environments
+- **CommonJS**: `dist/index.cjs.js` - For Jest, Node.js, and CommonJS
+  environments
 
 ### Using with Jest
 
@@ -64,10 +82,10 @@ To use this package with Jest, simply import from the CommonJS build:
 const { Container } = require('@davidcromianski-dev/ant-di');
 
 describe('Container Tests', () => {
-    it('should create a container instance', () => {
-        const container = new Container();
-        expect(container).toBeInstanceOf(Container);
-    });
+  it('should create a container instance', () => {
+    const container = new Container();
+    expect(container).toBeInstanceOf(Container);
+  });
 });
 ```
 
@@ -87,7 +105,7 @@ const db = container.get('database');
 
 // Auto-wiring example
 class UserService {
-    constructor(private db: DatabaseConnection) {}
+  constructor(private db: DatabaseConnection) {}
 }
 
 container.bind(UserService, [DatabaseConnection]);
@@ -96,7 +114,8 @@ const userService = container.get(UserService);
 
 ## Container
 
-The container is the main class of the package. It is used to store the services and parameters of the application.
+The container is the main class of the package. It is used to store the services
+and parameters of the application.
 
 ### Creating a Container
 
@@ -108,15 +127,17 @@ const container = new Container();
 
 // Container with initial values
 const container = new Container({
-    'app.name': 'My Application',
-    'app.version': '1.0.0'
+  'app.name': 'My Application',
+  'app.version': '1.0.0',
 });
 ```
 
 ### Basic Operations
 
 #### Registering Services
-To register services in the container, you can use either the `set` method (recommended) or `offsetSet` method:
+
+To register services in the container, you can use either the `set` method
+(recommended) or `offsetSet` method:
 
 ```typescript
 // Simple value
@@ -135,12 +156,16 @@ container.set('logger', Logger);
 container.offsetSet('app.name', 'My Application');
 ```
 
-> [!NOTE]
-> The `set` method is the recommended way to register services. The `offsetSet` method is maintained for backward compatibility.
+> [!NOTE] The `set` method is the recommended way to register services. The
+> `offsetSet` method is maintained for backward compatibility.
 >
-> The third parameter `factory` (default: false) allows you to directly register a function as a factory without calling `container.factory()` first. When `factory=true`, the function will be executed each time the service is requested.
+> The third parameter `factory` (default: false) allows you to directly register
+> a function as a factory without calling `container.factory()` first. When
+> `factory=true`, the function will be executed each time the service is
+> requested.
 
 #### Getting Services
+
 To get services from the container, you can use the `get` method:
 
 ```typescript
@@ -152,6 +177,7 @@ const logger = container.get(Logger);
 ```
 
 ### Container Management
+
 The container provides methods for managing its lifecycle:
 
 ```typescript
@@ -162,16 +188,19 @@ container.clear();
 container.dispose();
 ```
 
-> [!TIP]
-> Use `clear()` when you want to reset the container to its initial state, and `dispose()` when you're completely done with the container instance.
+> [!TIP] Use `clear()` when you want to reset the container to its initial
+> state, and `dispose()` when you're completely done with the container
+> instance.
 
-> [!NOTE]
-> If the service is a factory, it will be executed every time it is requested.
+> [!NOTE] If the service is a factory, it will be executed every time it is
+> requested.
 
 ### Version Compatibility
 
 #### Version 3.0.0+ (Current)
-The following methods are the **recommended** way to interact with the container:
+
+The following methods are the **recommended** way to interact with the
+container:
 
 ```typescript
 // Service registration
@@ -188,7 +217,9 @@ container.unset('key');
 ```
 
 #### Version < 3.0.0 (Legacy)
-The following methods are **deprecated** but still supported for backward compatibility:
+
+The following methods are **deprecated** but still supported for backward
+compatibility:
 
 ```typescript
 // Deprecated methods (still work, but not recommended)
@@ -198,26 +229,31 @@ container.offsetExists('key');
 container.offsetUnset('key');
 ```
 
-> [!IMPORTANT]
-> **Migration Guide**: All deprecated methods now internally call their modern equivalents:
+> [!IMPORTANT] **Migration Guide**: All deprecated methods now internally call
+> their modern equivalents:
+>
 > - `offsetSet()` → `set()`
 > - `offsetGet()` → `get()`
 > - `offsetExists()` → `has()`
 > - `offsetUnset()` → `unset()`
 >
-> Your existing code will continue to work, but consider migrating to the new methods for better maintainability.
+> Your existing code will continue to work, but consider migrating to the new
+> methods for better maintainability.
 
-> [!CAUTION]
-> If the service is not in the container, an exception will be thrown.
+> [!CAUTION] If the service is not in the container, an exception will be
+> thrown.
 
 #### Checking Service Existence
-To check if a service is registered in the container, you can use the `has` method:
+
+To check if a service is registered in the container, you can use the `has`
+method:
 
 ```typescript
 const exists = container.has('service');
 ```
 
 #### Removing Services
+
 To remove services from the container, you can use the `unset` method:
 
 ```typescript
@@ -226,13 +262,17 @@ container.unset('service');
 
 ### Auto-wiring
 
-Ant DI supports manual dependency injection for TypeScript classes. You can register dependencies manually.
+Ant DI supports manual dependency injection for TypeScript classes. You can
+register dependencies manually.
 
 #### Manual Dependency Registration
 
 ```typescript
 class UserService {
-    constructor(private db: DatabaseConnection, private logger: Logger) {}
+  constructor(
+    private db: DatabaseConnection,
+    private logger: Logger,
+  ) {}
 }
 
 // Register dependencies manually
@@ -244,7 +284,8 @@ const userService = container.get(UserService);
 
 #### Dependency Binding by Name
 
-For cases where you need to bind dependencies using class names as strings (useful for dynamic registration or avoiding circular import issues):
+For cases where you need to bind dependencies using class names as strings
+(useful for dynamic registration or avoiding circular import issues):
 
 ```typescript
 // Alternative binding method using class name
@@ -254,18 +295,19 @@ container.bind('UserService', [DatabaseConnection, Logger]);
 const userService = container.get(UserService);
 ```
 
-> [!TIP]
-> The `bind()` method accepts both constructor functions and class name strings, making it flexible for various use cases including dynamic class loading or avoiding potential circular import issues in complex applications.
+> [!TIP] The `bind()` method accepts both constructor functions and class name
+> strings, making it flexible for various use cases including dynamic class
+> loading or avoiding potential circular import issues in complex applications.
 
 #### Circular Dependency Detection
 
 ```typescript
 class ServiceA {
-    constructor(public serviceB: ServiceB) {}
+  constructor(public serviceB: ServiceB) {}
 }
 
 class ServiceB {
-    constructor(public serviceA: ServiceA) {}
+  constructor(public serviceA: ServiceA) {}
 }
 
 // This will throw a circular dependency error
@@ -276,9 +318,11 @@ container.bind(ServiceB, [ServiceA]);
 ### Factory and Protection
 
 #### Registering Factories
+
 To register factories in the container, you can use multiple methods:
 
 **Method 1: Using the `factory` method (traditional)**
+
 ```typescript
 const factory = (c: Container) => new Service();
 container.factory(factory);
@@ -286,18 +330,21 @@ container.set('service', factory);
 ```
 
 **Method 2: Using `set` with factory parameter (recommended)**
+
 ```typescript
 const factory = (c: Container) => new Service();
 container.set('service', factory, true); // true = register as factory
 ```
 
-> [!TIP]
-> All three methods are equivalent. The `set` method with `factory=true` is the recommended approach as it provides a more direct way to register factories without needing to call `factory()` first.
+> [!TIP] All three methods are equivalent. The `set` method with `factory=true`
+> is the recommended approach as it provides a more direct way to register
+> factories without needing to call `factory()` first.
 
-> [!TIP]
-> Useful for services that need to be created every time they are requested.
+> [!TIP] Useful for services that need to be created every time they are
+> requested.
 
 #### Protecting Services
+
 To protect services in the container, you can use the `protect` method:
 
 ```typescript
@@ -306,11 +353,13 @@ container.protect(callable);
 container.set('service', callable);
 ```
 
-> [!TIP]
-> By default, Ant DI assumes that any callable added to the container is a factory for a service, and it will invoke it when the key is accessed.
-> The `protect()` method overrides this behavior, allowing you to store the callable itself.
+> [!TIP] By default, Ant DI assumes that any callable added to the container is
+> a factory for a service, and it will invoke it when the key is accessed. The
+> `protect()` method overrides this behavior, allowing you to store the callable
+> itself.
 
 #### Frozen Keys
+
 Keys become frozen after first resolution of implicit factories:
 
 ```typescript
@@ -325,16 +374,18 @@ container.set('service', 'new value'); // Error!
 ```
 
 ### Getting Raw Values
+
 To get raw values from the container, you can use the `raw` method:
 
 ```typescript
 const rawValue = container.raw('service');
 ```
 
-> [!TIP]
-> Useful when you need access to the underlying value (such as a closure or callable) itself, rather than the result of its execution.
+> [!TIP] Useful when you need access to the underlying value (such as a closure
+> or callable) itself, rather than the result of its execution.
 
 ### Getting All Keys
+
 To get all keys registered in the container, you can use the `keys` method:
 
 ```typescript
@@ -343,25 +394,26 @@ const keys = container.keys();
 
 ### Service Providers
 
-Service providers allow you to organize the registration of services in the container.
+Service providers allow you to organize the registration of services in the
+container.
 
 ```typescript
 import { Container, IServiceProvider } from '@davidcromianski-dev/ant-di';
 
 class DatabaseServiceProvider implements IServiceProvider {
-    register(container: Container) {
-        container.set('db.host', 'localhost');
-        container.set('db.port', 5432);
-        
-        const connectionFactory = (c: Container) => ({
-            host: c.get('db.host'),
-            port: c.get('db.port'),
-            connect: () => `Connected to ${c.get('db.host')}:${c.get('db.port')}`
-        });
-        
-        container.factory(connectionFactory);
-        container.set('db.connection', connectionFactory);
-    }
+  register(container: Container) {
+    container.set('db.host', 'localhost');
+    container.set('db.port', 5432);
+
+    const connectionFactory = (c: Container) => ({
+      host: c.get('db.host'),
+      port: c.get('db.port'),
+      connect: () => `Connected to ${c.get('db.host')}:${c.get('db.port')}`,
+    });
+
+    container.factory(connectionFactory);
+    container.set('db.connection', connectionFactory);
+  }
 }
 
 // Register the service provider
@@ -378,9 +430,9 @@ Ant DI automatically caches class instances to ensure singleton behavior:
 
 ```typescript
 class DatabaseService {
-    constructor() {
-        console.log('DatabaseService created');
-    }
+  constructor() {
+    console.log('DatabaseService created');
+  }
 }
 
 // Register the class
@@ -395,8 +447,89 @@ const db2 = container.get(DatabaseService); // No log (cached)
 console.log(db1 === db2); // true - same instance
 ```
 
-> [!TIP]
-> Class instances are cached by their constructor function, ensuring that the same class always returns the same instance across the application.
+> [!TIP] Class instances are cached by their constructor function, ensuring that
+> the same class always returns the same instance across the application.
+
+### ValueObject Management
+
+Ant DI provides advanced ValueObject management for isolated dependency
+handling:
+
+```typescript
+import { Container, ValueObject } from '@davidcromianski-dev/ant-di';
+
+class DatabaseService {
+  constructor(public config: any) {}
+}
+
+class UserService {
+  constructor(public db: DatabaseService) {}
+}
+
+const container = new Container();
+
+// Create ValueObject with dependencies
+const dbValueObject = new ValueObject(
+  container,
+  'DatabaseService',
+  DatabaseService,
+);
+dbValueObject.addDependency('dbConfig');
+
+// Register configuration
+container.set('dbConfig', { host: 'localhost', port: 5432 });
+
+// Register service with ValueObject
+container.set('DatabaseService', DatabaseService, false, ['dbConfig']);
+
+// Get ValueObject from container
+const valueObject = container.getValueObject('DatabaseService');
+
+// ValueObject management methods
+console.log('Has dependency:', valueObject?.hasDependency('dbConfig'));
+console.log('Dependencies:', valueObject?.getDependencyKeys());
+console.log('Is resolvable:', valueObject?.isResolvable());
+
+// Create instance with dependency injection
+const dbInstance = valueObject?.getValue();
+console.log('Database instance:', dbInstance instanceof DatabaseService);
+```
+
+#### ValueObject Features
+
+- **Dependency Management**: Add, remove, and validate dependencies
+- **Circular Dependency Detection**: Automatic detection and prevention
+- **Instance Creation**: Singleton and factory patterns
+- **Cloning**: Create copies of ValueObjects
+- **Validation**: Check if dependencies are resolvable
+
+```typescript
+// Advanced ValueObject usage
+const valueObject = new ValueObject(container, 'UserService', UserService);
+
+// Add multiple dependencies
+valueObject
+  .addDependency('DatabaseService')
+  .addDependency('Logger')
+  .asSingleton();
+
+// Validate dependencies
+if (valueObject.isResolvable()) {
+  const instance = valueObject.getValue();
+  console.log('Service created:', instance);
+}
+
+// Clone ValueObject
+const cloned = valueObject.clone();
+console.log('Cloned dependencies:', cloned.getDependencyKeys());
+
+// Clear all dependencies
+valueObject.clearDependencies();
+console.log(
+  'Dependencies cleared:',
+  valueObject.getDependencyKeys().length === 0,
+);
+```
 
 ### Proxy Access
 
@@ -412,7 +545,8 @@ console.log(container.appName); // "My App"
 
 ## Testing
 
-The project uses [Poku](https://github.com/antfu/poku) for testing. All tests are located in the `tests/` directory.
+The project uses [Poku](https://github.com/antfu/poku) for testing. All tests
+are located in the `tests/` directory.
 
 ### Running Tests
 
@@ -446,14 +580,14 @@ import { describe, it, assert } from 'poku';
 import { Container } from '../src';
 
 describe('Container', () => {
-    describe('Basic Operations', () => {
-        it('should set and get a value', () => {
-            const container = new Container();
-            container.set('key', 'value');
-            const value = container.get('key');
-            assert.equal(value, 'value');
-        });
+  describe('Basic Operations', () => {
+    it('should set and get a value', () => {
+      const container = new Container();
+      container.set('key', 'value');
+      const value = container.get('key');
+      assert.equal(value, 'value');
     });
+  });
 });
 ```
 
@@ -462,36 +596,49 @@ describe('Container', () => {
 Comprehensive examples are available in the `examples/` directory:
 
 ### Basic Usage
+
 ```bash
 npx ts-node examples/basic-usage.ts
 ```
-Demonstrates simple value storage, factory functions, and basic container operations.
+
+Demonstrates simple value storage, factory functions, and basic container
+operations.
 
 ### Dependency Injection
+
 ```bash
 npx ts-node examples/dependency-injection.ts
 ```
-Shows auto-wiring, manual dependency registration, and circular dependency detection.
+
+Shows auto-wiring, manual dependency registration, and circular dependency
+detection.
 
 ### Factories and Protection
+
 ```bash
 npx ts-node examples/factories-and-protection.ts
 ```
+
 Explains factory functions, protected callables, and frozen key behavior.
 
 ### Service Providers
+
 ```bash
 npx ts-node examples/service-providers.ts
 ```
+
 Demonstrates modular service registration using service providers.
 
 ### Advanced Patterns
+
 ```bash
 npx ts-node examples/advanced-patterns.ts
 ```
+
 Real-world scenarios including event systems and complex dependency graphs.
 
 ### Run All Examples
+
 ```bash
 npx ts-node examples/index.ts
 ```
@@ -501,6 +648,7 @@ npx ts-node examples/index.ts
 ### Container Class
 
 #### Constructor
+
 ```typescript
 new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 ```
@@ -508,32 +656,70 @@ new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 #### Methods
 
 ##### Core Container Operations
-- `set<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory?: boolean): void` - **Recommended method** to register a value, factory, or callable in the container. The optional `factory` parameter (default: false) allows direct factory registration when set to true.
-- `get<T>(key: string | Constructor<T>): T` - **Recommended method** to retrieve a service by key or class constructor with auto-wiring
-- `has(key: string): boolean` - **Recommended method** to check if a key exists in the container
-- `unset(key: string): void` - **Recommended method** to remove a key from the container
+
+- `set<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory?: boolean): void` -
+  **Recommended method** to register a value, factory, or callable in the
+  container. The optional `factory` parameter (default: false) allows direct
+  factory registration when set to true.
+- `get<T>(key: string | Constructor<T>): T` - **Recommended method** to retrieve
+  a service by key or class constructor with auto-wiring
+- `has(key: string): boolean` - **Recommended method** to check if a key exists
+  in the container
+- `unset(key: string): void` - **Recommended method** to remove a key from the
+  container
 
 ##### Legacy Methods (Deprecated since 3.0.0)
-- `offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory?: boolean): void` - **Deprecated**. Use `set()` instead.
-- `offsetGet<T>(key: string | Constructor<T>): T` - **Deprecated**. Use `get()` instead.
+
+- `offsetSet<T>(key: string, value: ValueOrFactoryOrCallable<T>, factory?: boolean): void` -
+  **Deprecated**. Use `set()` instead.
+- `offsetGet<T>(key: string | Constructor<T>): T` - **Deprecated**. Use `get()`
+  instead.
 - `offsetExists(key: string): boolean` - **Deprecated**. Use `has()` instead.
 - `offsetUnset(key: string): void` - **Deprecated**. Use `unset()` instead.
 
 ##### Factory and Protection
-- `factory<T>(factory: Factory<T>): Factory<T>` - Mark a factory to always create new instances (prevents singleton caching)
-- `protect(callable: Callable): Callable` - Protect a callable from being treated as a factory
+
+- `factory<T>(factory: Factory<T>): Factory<T>` - Mark a factory to always
+  create new instances (prevents singleton caching)
+- `protect(callable: Callable): Callable` - Protect a callable from being
+  treated as a factory
 
 ##### Utility Methods
-- `raw<T>(key: string): T` - Get the raw value without executing factories or callables
+
+- `raw<T>(key: string): T` - Get the raw value without executing factories or
+  callables
 - `keys(): string[]` - Get all registered keys in the container
-- `clear(): void` - Clear all registered services and reset the container to its initial state
+- `clear(): void` - Clear all registered services and reset the container to its
+  initial state
 - `dispose(): void` - Dispose of the container and clean up resources
 
 ##### Service Providers
-- `register(provider: IServiceProvider, values?: Record<string, ValueOrFactoryOrCallable<any>>): Container` - Register a service provider with optional additional values
+
+- `register(provider: IServiceProvider, values?: Record<string, ValueOrFactoryOrCallable<any>>): Container` -
+  Register a service provider with optional additional values
 
 ##### Dependency Injection
-- `bind(target: Function | string, dependencies: any[]): void` - Bind dependencies for a class constructor or class name string
+
+- `bind(target: Function | string, dependencies: any[]): void` - Bind
+  dependencies for a class constructor or class name string
+- `getValueObject(key: string): ValueObjectInterface | undefined` - Get a
+  ValueObject for a given key if it exists
+
+##### ValueObject Management
+
+- `addDependency(dependency: DependencyKey): this` - Add a dependency to the
+  ValueObject
+- `removeDependency(dependency: DependencyKey): this` - Remove a specific
+  dependency
+- `hasDependency(dependency: DependencyKey): boolean` - Check if a dependency
+  exists
+- `validateDependencies(): boolean` - Validate all dependencies are available
+- `resolveDependencies(): any[]` - Resolve all dependencies with circular
+  dependency detection
+- `isResolvable(): boolean` - Check if the ValueObject can be resolved
+- `getDependencyKeys(): DependencyKey[]` - Get all dependency keys
+- `clearDependencies(): this` - Clear all dependencies
+- `clone(): ValueObjectInterface` - Create a copy of the ValueObject
 
 ## Contributing
 
@@ -546,4 +732,5 @@ new Container(values?: Record<string, ValueOrFactoryOrCallable<any>>)
 
 ## License
 
-This project is licensed under the MIT License. For more details, see the LICENSE file.
+This project is licensed under the MIT License. For more details, see the
+LICENSE file.

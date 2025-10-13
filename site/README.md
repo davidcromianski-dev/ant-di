@@ -1,6 +1,7 @@
 # Ant DI - Site
 
-Site oficial do Ant DI, uma biblioteca de injeção de dependência simples e leve para JavaScript e TypeScript.
+Site oficial do Ant DI, uma biblioteca de injeção de dependência simples e leve
+para JavaScript e TypeScript.
 
 ## Tecnologias
 

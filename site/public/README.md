@@ -13,6 +13,7 @@ O ícone será automaticamente usado no site.
 ## Atribuição
 
 A atribuição do Flaticon já está incluída no footer do site:
+
 - Link: https://www.flaticon.com/free-icons/ant
 - Autor: Freepik
-- Licença: Flaticon 
+- Licença: Flaticon

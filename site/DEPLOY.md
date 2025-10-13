@@ -5,6 +5,7 @@
 ### 1. Configuração Inicial
 
 O site já está configurado para GitHub Pages com:
+
 - `homepage` configurado no `package.json`
 - Scripts de deploy configurados
 - Dependência `gh-pages` instalada
@@ -18,6 +19,7 @@ npm run deploy
 ```
 
 Este comando irá:
+
 1. Executar `npm run build` (via predeploy)
 2. Fazer deploy da pasta `build/` para o branch `gh-pages`
 
@@ -51,6 +53,7 @@ git push origin gh-pages
 ### 6. Atualizações
 
 Para atualizar o site:
+
 1. Faça as alterações no código
 2. Execute `npm run deploy`
 3. O GitHub Pages será atualizado automaticamente
@@ -58,6 +61,7 @@ Para atualizar o site:
 ### 7. Troubleshooting
 
 Se o site não aparecer:
+
 - Verifique se o branch `gh-pages` foi criado
 - Aguarde alguns minutos para o GitHub processar
 - Verifique as configurações de Pages no repositório
@@ -66,6 +70,7 @@ Se o site não aparecer:
 ### 8. Domínio Customizado (Opcional)
 
 Para usar um domínio customizado:
+
 1. Adicione o domínio nas configurações do GitHub Pages
 2. Atualize o `homepage` no `package.json`
-3. Atualize as meta tags no `public/index.html` 
+3. Atualize as meta tags no `public/index.html`

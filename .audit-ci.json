@@ -1,0 +1,21 @@
+{
+  "low": true,
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "allowlist": [],
+  "skip-dev": false,
+  "report-type": "summary",
+  "output-format": "text",
+  "pass-enoaudit": false,
+  "pass-on-scope": [],
+  "skip-advisories": [],
+  "skip-dev-dependencies": false,
+  "skip-high-severity": false,
+  "skip-low-severity": false,
+  "skip-moderate-severity": false,
+  "skip-critical-severity": false,
+  "skip-suppressed": false,
+  "suppress": [],
+  "whitelist": []
+}

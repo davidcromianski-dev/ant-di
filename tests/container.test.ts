@@ -6,3 +6,4 @@ import './frozen-keys.test';
 import './proxy-access.test';
 import './constructor-init.test';
 import './service-providers.test';
+import './valueobject-features.test';
