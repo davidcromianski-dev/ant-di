@@ -3,7 +3,7 @@ import { Container } from './src';
 class Y {}
 
 class X {
-  constructor(public _y: Y) {}
+  constructor(public y: Y) {}
 }
 
 const x = Symbol('X');
@@ -26,4 +26,4 @@ console.log('X instance:', xInstance);
 // eslint-disable-next-line no-console, no-undef
 console.log('X instance is instance of X:', xInstance instanceof X);
 // eslint-disable-next-line no-console, no-undef
-console.log('X instance has Y dependency:', xInstance._y instanceof Y);
+console.log('X instance has Y dependency:', xInstance.y instanceof Y);

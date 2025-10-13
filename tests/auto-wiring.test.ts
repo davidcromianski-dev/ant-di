@@ -7,13 +7,13 @@ class NoDepsClass {
 }
 
 class SingleDepClass {
-  constructor(public _noDeps: NoDepsClass) {}
+  constructor(public noDeps: NoDepsClass) {}
 }
 
 class MultiDepClass {
   constructor(
-    public _noDeps: NoDepsClass,
-    public _singleDep: SingleDepClass,
+    public noDeps: NoDepsClass,
+    public singleDep: SingleDepClass,
   ) {}
 }
 
@@ -57,11 +57,11 @@ describe('📦 Container - Auto-wiring', () => {
 
   it('should handle circular dependency detection during binding', () => {
     class TestCircularA {
-      constructor(public _b: TestCircularB) {}
+      constructor(public b: TestCircularB) {}
     }
 
     class TestCircularB {
-      constructor(public _a: TestCircularA) {}
+      constructor(public a: TestCircularA) {}
     }
 
     const container = new Container();
@@ -77,7 +77,7 @@ describe('📦 Container - Auto-wiring', () => {
 
   it('should handle invalid dependencies during binding', () => {
     class UnresolvableClass {
-      constructor(public _nonExistent: any) {}
+      constructor(public nonExistent: any) {}
     }
 
     const container = new Container();
@@ -99,7 +99,7 @@ describe('📦 Container - Auto-wiring', () => {
 
   it('should handle self-referential circular dependency', () => {
     class SelfReferentialClass {
-      constructor(public _self: SelfReferentialClass) {}
+      constructor(public self: SelfReferentialClass) {}
     }
 
     const container = new Container();

@@ -3,17 +3,17 @@ import { Container, ValueObject } from '../src';
 
 // Test classes for ValueObject functionality
 class DatabaseService {
-  constructor(public _config: any) {}
+  constructor(public config: any) {}
 }
 
 class UserService {
-  constructor(public _db: DatabaseService) {}
+  constructor(public db: DatabaseService) {}
 }
 
 class OrderService {
   constructor(
-    public _userService: UserService,
-    public _db: DatabaseService,
+    public userService: UserService,
+    public db: DatabaseService,
   ) {}
 }
 

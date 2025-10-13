@@ -31,7 +31,7 @@ export class ValueObject implements ValueObjectInterface {
       return this.instance as T;
     }
     if (this.factory) {
-      return this.value(this.container) as T;
+      return this._value(this._container) as T;
     }
     return this.createInstance() as T;
   }
@@ -41,7 +41,7 @@ export class ValueObject implements ValueObjectInterface {
   }
 
   getKey(): DependencyKey {
-    return this.key;
+    return this._key;
   }
 
   // New isolated logic methods for better dependency management
@@ -63,7 +63,7 @@ export class ValueObject implements ValueObjectInterface {
 
   validateDependencies(): boolean {
     try {
-      return this.dependencies.every(dep => this.container.has(dep));
+      return this.dependencies.every(dep => this._container.has(dep));
     } catch {
       return false;
     }
@@ -71,19 +71,19 @@ export class ValueObject implements ValueObjectInterface {
 
   resolveDependencies(): any[] {
     // Check for circular dependencies
-    if (this.resolutionPath.includes(this.key)) {
-      throw new Error(`Circular dependency detected for ${String(this.key)}`);
+    if (this.resolutionPath.includes(this._key)) {
+      throw new Error(`Circular dependency detected for ${String(this._key)}`);
     }
 
-    this.resolutionPath.push(this.key);
+    this.resolutionPath.push(this._key);
 
     try {
       const resolved = this.dependencies.map(dep => {
         // Handle constructor functions by converting to string key
         const depKey = typeof dep === 'function' ? dep.name : dep;
 
-        if (this.container.has(depKey)) {
-          const value = this.container.getRawValue(depKey);
+        if (this._container.has(depKey)) {
+          const value = this._container.getRawValue(depKey);
           // If it's a constructor function, instantiate it
           if (
             typeof value === 'function' &&
@@ -92,14 +92,14 @@ export class ValueObject implements ValueObjectInterface {
           ) {
             return new value();
           }
-          return this.container.get(depKey);
+          return this._container.get(depKey);
         }
         throw new Error(`Dependency ${String(dep)} not found in container`);
       });
 
       return resolved;
     } finally {
-      this.resolutionPath = this.resolutionPath.filter(key => key !== this.key);
+      this.resolutionPath = this.resolutionPath.filter(key => key !== this._key);
     }
   }
 
@@ -118,7 +118,7 @@ export class ValueObject implements ValueObjectInterface {
   }
 
   clone(): ValueObjectInterface {
-    const cloned = new ValueObject(this.container, this.key, this.value);
+    const cloned = new ValueObject(this._container, this._key, this._value);
     cloned.singleton = this.singleton;
     cloned.factory = this.factory;
     cloned.dependencies = [...this.dependencies];
@@ -127,15 +127,15 @@ export class ValueObject implements ValueObjectInterface {
 
   // Private helper methods
   private createInstance(): any {
-    if (typeof this.value === 'function') {
+    if (typeof this._value === 'function') {
       const resolvedDeps = this.resolveDependencies();
-      return new this.value(...resolvedDeps);
+      return new this._value(...resolvedDeps);
     }
-    return this.value;
+    return this._value;
   }
 
   private hasCircularDependency(): boolean {
     // Only check for circular dependency if we're currently in resolution path
-    return this.resolutionPath.length > 0 && this.resolutionPath.includes(this.key);
+    return this.resolutionPath.length > 0 && this.resolutionPath.includes(this._key);
   }
 }
