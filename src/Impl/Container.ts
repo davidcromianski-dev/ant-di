@@ -6,6 +6,7 @@ import {
   KeyIsNotDefinedError,
   NoDependenciesRegisteredError,
 } from '../Errors';
+import { KeyCannotBeEmptyError } from '../Errors/KeyCannotBeEmptyError';
 import { ContainerInterface, ServiceProviderInterface } from '../Interfaces';
 import { Callable, Constructor, DependencyKey, Factory, ValueOrFactoryOrCallable } from '../Types';
 import { ValueObject } from './ValueObject';
@@ -235,6 +236,10 @@ export class Container implements ContainerInterface {
 
     if (this.frozen.has(key)) {
       throw new KeyFrozenError(key);
+    }
+
+    if (key === '') {
+      throw new KeyCannotBeEmptyError();
     }
 
     // Create ValueObject if dependencies are provided

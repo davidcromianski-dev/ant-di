@@ -21,6 +21,11 @@ describe('📦 Container - Basic Operations', () => {
     assert.throws(() => container.get('nonExistentKey'), 'Key "nonExistentKey" is not defined.');
   });
 
+  it('should throw an error when getting a key that is empty', () => {
+    const container = new Container();
+    assert.throws(() => container.get(''), 'Key cannot be empty.');
+  });
+
   it('should check if a key exists', () => {
     const container = new Container();
     container.set('key', 'value');
