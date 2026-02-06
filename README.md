@@ -173,7 +173,7 @@ To get services from the container, you can use the `get` method:
 const appName = container.get('app.name');
 
 // Get by class constructor (auto-wiring)
-const logger = container.get(Logger);
+const logger = container.get(LoggerInterface);
 ```
 
 ### Container Management
@@ -197,7 +197,7 @@ container.dispose();
 
 ### Version Compatibility
 
-#### Version 3.0.0+ (Current)
+#### Version 2.0.0+ (Current)
 
 The following methods are the **recommended** way to interact with the
 container:
@@ -216,7 +216,7 @@ container.has('key');
 container.unset('key');
 ```
 
-#### Version < 3.0.0 (Legacy)
+#### Version < 2.0.0 (Legacy)
 
 The following methods are **deprecated** but still supported for backward
 compatibility:
